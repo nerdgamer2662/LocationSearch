@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 function LoginForm() {
   const [username, setUsername] = useState("");
@@ -11,14 +12,15 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/auth/signin", {
+      const response = await axios.post(`${API_BASE_URL}/api/users/signup`, {
         username,
         password,
       });
-      localStorage.setItem("token", response.data.accessToken);
+
+      alert("Login successful!");
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response.data.message || "An error occurred during login");
+      setError(err.response?.data || "An error occurred during login");
     }
   };
 

@@ -4,6 +4,7 @@ import "./App.css";
 import LandingPage from "./components/LandingPage";
 import SignUpForm from "./components/SignUpForm";
 import LoginForm from "./components/LoginForm";
+import Dashboard from "./components/Dashboard"; // Import the Dashboard component
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/signup" element={<SignUpForm />} />
             <Route path="/login" element={<LoginForm />} />
+            <Route path="/dashboard" element={<Dashboard />} />{" "}
+            {/* Add this line */}
           </Routes>
         </main>
       </div>

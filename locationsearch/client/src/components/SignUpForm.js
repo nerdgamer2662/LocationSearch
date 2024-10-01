@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 function SignUpForm() {
   const [username, setUsername] = useState("");
@@ -11,10 +12,15 @@ function SignUpForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/api/auth/signup", { username, password });
+      await axios.post(
+        `${API_BASE_URL}/api/users/signup`,
+        { username, password },
+        { withCredentials: true }
+      );
+      alert("Sign up successful!");
       navigate("/login");
     } catch (err) {
-      setError(err.response.data.message || "An error occurred during sign up");
+      setError(err.response?.data || "An error occurred during sign up");
     }
   };
 
