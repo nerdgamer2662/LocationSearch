@@ -1,5 +1,5 @@
-server/HELP.md
-server/target/
+/locationsearch/server/HELP.md
+/locationsearch/server/target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -12,8 +12,8 @@ server/target/
 .springBeans
 .sts4-cache
 
-/client/node_modules
-/client/.pnp
+/locationsearch/client/node_modules
+/locationsearch/client/.pnp
 .pnp.js
 
 /client/coverage
@@ -32,5 +32,5 @@ yarn-error.log*
 
 .vscode/
 
-/server/src/main/java/com/cs3300/group8/locationsearch/payload/
-/server/src/main/java/com/cs3300/group8/locationsearch/security/
+/locationsearch/server/src/main/java/com/cs3300/group8/locationsearch/payload/
+/locationsearch/server/src/main/java/com/cs3300/group8/locationsearch/security/
