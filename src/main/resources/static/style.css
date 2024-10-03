@@ -1,5 +1,29 @@
 /* Set the size of the div element that contains the map */
 #map { /* This applies to the div with id 'map' */
-    height: 100vh; /* The height is 400 pixels */
+    height: 400px; /* The height is 400 pixels */
     width: 100%; /* The width is the width of the web page */
 }
+
+#search-area {
+    display: flex; /* Use flexbox to align items horizontally */
+    align-items: center; /* Vertically center the items */
+    gap: 15px; /* Add spacing between each item */
+    margin-bottom: 20px; /* Add space between the search area and other elements */
+    padding: 5px; /* Add padding around the search area */
+    border: 1px solid #ccc; /* Add a light border */
+    border-radius: 5px; /* Round the corners slightly */
+    background-color: #f9f9f9; /* Light background color */
+  }
+  
+  /* Style for the input fields */
+#search-area input {
+    padding: 8px; /* Add padding inside the input */
+    border: 1px solid #ccc; /* Light border around inputs */
+    border-radius: 4px; /* Slight rounding on input edges */
+    width: 150px; /* Fixed width for inputs */
+  }
+  
+  /* Style for the labels */
+  #search-area label {
+    font-weight: bold; /* Make the label text bold */
+  }

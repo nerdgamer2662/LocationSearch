@@ -1,9 +1,10 @@
-/locationsearch/server/HELP.md
-/locationsearch/server/target/
+HELP.md
+target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### STS ###
 .apt_generated
 .classpath
 .factorypath
@@ -30,6 +31,21 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/locationsearch/server/HELP.md
+/locationsearch/server/target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
 /locationsearch/client/node_modules
 /locationsearch/client/.pnp
 .pnp.js

@@ -8,74 +8,44 @@
   <head>
     <title>Add Map</title>
 
-    <!-- Link to an external stylesheet for custom styles -->
+    <!-- Imported Style (src\main\resources\static\style.css) -->
+    <!-- Defines Page style for Map and Input Fields -->
     <link rel="stylesheet" type="text/css" href="/style.css" />
 
-    <!-- Import a JavaScript module file, `index.js`, to handle additional logic -->
+    <!-- Imported Javascript (src\main\resources\static\index.js) -->
+    <!-- Main Interactive Map Logic -->
     <script type="module" src="/index.js"></script>
   </head>
   <body>
-    <!-- Heading for the demo page -->
     <h3>My Google Maps Demo</h3>
 
-    <!-- Div element that will be used to render the Google Map -->
+    <!-- Map -->
     <div id="map"></div>
 
-    <!--
-      The following script dynamically loads the Google Maps JavaScript API.
-      It includes the necessary configuration to load the API with your provided API key.
-      The script handles loading the library asynchronously and ensures that only the required parts of the API are loaded.
-      It includes a nonce attribute (optional) for security purposes if a nonce is used on the page.
-    -->
+    <!-- Map Input Fields -->
+    <div id="search-area">
+        <label for="latitude">Latitude:</label>
+        <input type="text" id="latitude" name="latitude" />
 
-    <!-- prettier-ignore -->
+        <label for="longitude">Longitude:</label>
+        <input type="text" id="longitude" name="longitude" />
+
+        <label for="radius">Search radius:</label>
+        <input type="text" id="radius" name="radius" />
+    </div>
+
+    <!-- Map Input Button -->
+    <button id="searchButton">Search</button>
+
+
+    <!-- Loads the Google Maps JavaScript API. -->
     <script>
-      // Immediately Invoked Function Expression (IIFE) to load Google Maps JavaScript API
-      (g => {
-        var h, a, k, p = "The Google Maps JavaScript API", // Description for error handling
-            c = "google", // Reference to the global 'google' object
-            l = "importLibrary", // Function to import the library
-            q = "__ib__", // Callback function name
-            m = document, // Alias for the document object
-            b = window; // Alias for the window object
-
-        // Create or use an existing google object in the global window object
-        b = b[c] || (b[c] = {});
-        var d = b.maps || (b.maps = {}); // Create or use existing google.maps object
-        var r = new Set(), // Set to keep track of loaded libraries
-            e = new URLSearchParams, // URLSearchParams object to construct the API request URL
-            u = () => h || (h = new Promise(async (f, n) => { // Lazy load the API once
-              await (a = m.createElement("script")); // Create a new script element
-
-              // Set the API request parameters, including libraries
-              e.set("libraries", [...r] + "");
-              for (k in g) {
-                e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-              }
-              e.set("callback", c + ".maps." + q); // Set callback function to initialize the map
-
-              // Set the script source to the Google Maps API URL
-              a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-
-              // On success, resolve the promise to load the map
-              d[q] = f;
-
-              // Handle any error that occurs while loading the script
-              a.onerror = () => h = n(Error(p + " could not load."));
-
-              // Apply nonce if the page includes one for security
-              a.nonce = m.querySelector("script[nonce]")?.nonce || "";
-              m.head.append(a); // Append the script to the document's head
-            }));
-
-        // Check if the library is already loaded, log a warning if it's being loaded more than once
-        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n));
-      })
-      // Configuration object passed to the Google Maps API loader
-      ({
-        key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg", // Your Google Maps API key
-        v: "weekly" // Use the weekly version of the Google Maps API
-      });
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+          key: "AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg",
+          v: "weekly",
+          // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+          // Add other bootstrap parameters as needed, using camel case.
+        });
     </script>
   </body>
 </html>

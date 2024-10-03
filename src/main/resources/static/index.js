@@ -1,17 +1,15 @@
-// Initialize and add the map
 let map;
 let markers = [];
-let AdvancedMarkerElement;
 
+//Based on: https://developers.google.com/maps/documentation/javascript/adding-a-google-map
+//Loads the Map for the Page and sets up Handlers
 async function initMap() {
   // The location of georgia_tech 
   const georgia_tech = { lat: 33.7756, lng: -84.3963 };
-  const culc = { lat: 33.7749, lng: -84.3958};
 
   // Load necessary libraries from the Google Maps API
   //@ts-ignore
   const { Map } = await google.maps.importLibrary("maps");
-  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
   // Create a new map centered at georgia_tech
   map = new Map(document.getElementById("map"), {
@@ -20,40 +18,40 @@ async function initMap() {
     mapId: "DEMO_MAP_ID", // This can be customized if you have a custom map style
   });
 
+  document.getElementById("searchButton").addEventListener("click", function() {
+    const latitude  = parseFloat(document.getElementById("latitude").value);
+    const longitude = parseFloat(document.getElementById("longitude").value);
+    const radius    = parseFloat(document.getElementById("radius").value);
 
-  /*
-  // Create a marker positioned at georgia_tech
-  const marker = new AdvancedMarkerElement({
-    map: map,
-    position: georgia_tech,
-    title: "georgia_tech", // Optional: Tooltip text for the marker
-  });
-*/
+    console.log("Latitude: ", latitude);
+    console.log("Longitude: ", longitude);
+    console.log("Radius: ", radius);
 
-
-  addMarker(georgia_tech.lat, georgia_tech.lng, "Georgia Tech");
-  addMarker(culc.lat, culc.lng, "culc");  
-  deleteMarkers();  
-  addMarker(culc.lat, culc.lng, "culc");  
-
-  //const culc = { lat: 33.7749, lng: -84.3958};
-  //addMarker(culc.lat, culc.lng, "culc");
+    centerMap(latitude, longitude);
+    nearbySearch(latitude, longitude, radius);
+  })
 }
 
-function addMarker(latitude, longitude, title) {
+// Adds Mark Graphic on Map
+async function addMarker(place) {
 
-  // Create a marker positioned at georgia_tech
-  //const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
   if (map) {
-    const marker = new google.maps.Marker({
-      map: map,
-      position: {lat: latitude, lng: longitude},
-      title: title, // Optional: Tooltip text for the marker
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+    const markerView = new AdvancedMarkerElement({
+      map,
+      position: place.location,
+      title: place.displayName,
     });
 
-    markers.push(marker);
+    markers.push(markerView);
   }
 
+}
+
+// Centers map based on supplied coords.
+function centerMap(latitude, longitude) {
+  map.setCenter({ lat: latitude, lng: longitude })
 }
 
 // Sets the map on all markers in the array.
@@ -78,9 +76,58 @@ function deleteMarkers() {
   hideMarkers();
   markers = [];
 }
-// Call the initMap function to load the map when the page is loaded
 
+//Based on: https://developers.google.com/maps/documentation/javascript/nearby-search
+//Marks nearby places of interests
+async function nearbySearch(latitude, longitude, radius) {
+  //@ts-ignore
+  const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary(
+    "places",
+  );
+
+  // Restrict within the map viewport.
+  let center = new google.maps.LatLng(latitude, longitude);
+  const request = {
+    // required parameters
+    fields: ["displayName", "location"],
+    locationRestriction: {
+      center: center,
+      radius: radius,
+    },
+    // optional parameters
+    includedPrimaryTypes: ["restaurant"],
+    maxResultCount: 5,
+    rankPreference: SearchNearbyRankPreference.POPULARITY,
+    language: "en-US",
+    region: "us",
+  };
+  //@ts-ignore
+  const { places } = await Place.searchNearby(request);
+
+  deleteMarkers();
+
+  if (places.length) {
+
+    console.log(places);
+
+    const { LatLngBounds } = await google.maps.importLibrary("core");
+    const bounds = new LatLngBounds();
+
+    // Loop through and get all the results.
+    places.forEach((place) => {
+
+      addMarker(place);
+
+      bounds.extend(place.location);
+      console.log(place);
+    });
+    map.fitBounds(bounds);
+  } else {
+    console.log("No results");
+  }
+}
+
+//Called during page startup
 initMap();
 
-//while(!map) {}
 
