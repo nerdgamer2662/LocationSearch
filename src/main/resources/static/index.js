@@ -1,5 +1,6 @@
 let map;
 let markers = [];
+const MI_TO_METERS = 1609.344;
 
 //Based on: https://developers.google.com/maps/documentation/javascript/adding-a-google-map
 //Loads the Map for the Page and sets up Handlers
@@ -18,10 +19,17 @@ async function initMap() {
     mapId: "DEMO_MAP_ID", // This can be customized if you have a custom map style
   });
 
+  let infoWindow = new google.maps.InfoWindow({
+    content: "Click anywhere on the map to get the center!",
+    position: georgia_tech,
+  });
+
+  infoWindow.open(map);
+
   document.getElementById("searchButton").addEventListener("click", function() {
     const latitude  = parseFloat(document.getElementById("latitude").value);
     const longitude = parseFloat(document.getElementById("longitude").value);
-    const radius    = parseFloat(document.getElementById("radius").value);
+    const radius    = parseFloat(document.getElementById("radius").value) * MI_TO_METERS;
 
     console.log("Latitude: ", latitude);
     console.log("Longitude: ", longitude);
@@ -30,6 +38,14 @@ async function initMap() {
     centerMap(latitude, longitude);
     nearbySearch(latitude, longitude, radius);
   })
+
+  map.addListener("click", (click) => {
+    document.getElementById("latitude").value = click.latLng.lat();
+    document.getElementById("longitude").value = click.latLng.lng();
+    centerMap(click.latLng.lat(), click.latLng.lng());
+
+    infoWindow.close();
+  });
 }
 
 // Adds Mark Graphic on Map
@@ -41,7 +57,33 @@ async function addMarker(place) {
     const markerView = new AdvancedMarkerElement({
       map,
       position: place.location,
-      title: place.displayName,
+      title: place.displayName + "\nDistance: " + place.distance + " mi.\nRating: " + place.rating,
+    });
+
+    markerView.addListener("click", (click) => {
+
+      let infoWindow = new google.maps.InfoWindow({
+        content:
+          "<h1>" +
+          place.displayName +
+          "</h1>" +
+          "<p>" +
+          "Distance: " +
+          place.distance + 
+          " mi.<br />Rating: " +
+          place.rating + 
+          "<br />" + 
+          (place.editorialSummary ? place.editorialSummary : "") +
+          "<br />Website: " +
+          place.websiteURI +
+          "<br /><a href=https://maps.google.com?saddr=Current+Location&daddr=" +
+          place.location.lat() +
+          "," +
+          place.location.lng() +
+          ">Directions</a></p>",
+        position: place.location,
+      });
+      infoWindow.open(markerView.map, markerView);
     });
 
     markers.push(markerView);
@@ -89,7 +131,7 @@ async function nearbySearch(latitude, longitude, radius) {
   let center = new google.maps.LatLng(latitude, longitude);
   const request = {
     // required parameters
-    fields: ["displayName", "location"],
+    fields: ["displayName", "location", 'rating', 'websiteURI', 'editorialSummary'],
     locationRestriction: {
       center: center,
       radius: radius,
@@ -116,6 +158,8 @@ async function nearbySearch(latitude, longitude, radius) {
     // Loop through and get all the results.
     places.forEach((place) => {
 
+      place.distance = haversine_distance(center, place.location);
+
       addMarker(place);
 
       bounds.extend(place.location);
@@ -125,6 +169,17 @@ async function nearbySearch(latitude, longitude, radius) {
   } else {
     console.log("No results");
   }
+}
+
+function haversine_distance(pos1, pos2) {
+  var R = 3958.8; // Radius of the Earth in miles
+  var rlat1 = pos1.lat() * (Math.PI/180); // Convert degrees to radians
+  var rlat2 = pos2.lat() * (Math.PI/180); // Convert degrees to radians
+  var difflat = rlat2-rlat1; // Radian difference (latitudes)
+  var difflon = (pos2.lng()-pos1.lng()) * (Math.PI/180); // Radian difference (longitudes)
+
+  var d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat/2)*Math.sin(difflat/2)+Math.cos(rlat1)*Math.cos(rlat2)*Math.sin(difflon/2)*Math.sin(difflon/2)));
+  return +(d.toFixed(1));
 }
 
 //Called during page startup
