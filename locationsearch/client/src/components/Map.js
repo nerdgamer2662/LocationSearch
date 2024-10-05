@@ -41,17 +41,13 @@ function Map() {
       const lat = parseFloat(latitude);
       const lng = parseFloat(longitude);
       let rad = parseFloat(radius) * MI_TO_METERS; // Convert miles to meters
-      
+
       // Ensure radius is within the valid range
       rad = Math.min(Math.max(rad, 0), 50000);
-      
+
       centerMap(lat, lng);
       const foundPlaces = await nearbySearch(lat, lng, rad);
       setPlaces(foundPlaces);
-    //   const places = await nearbySearch(lat, lng, rad);
-    //   console.log("Nearby places:", places);
-      // TODO: Display the places on the map or in a list
-      
     } catch (err) {
       console.error("Error during search:", err);
       setError("An error occurred during search. Please try again.");
@@ -60,11 +56,11 @@ function Map() {
 
   return (
     <div className="container mx-auto px-4">
-      <h1 className="text-2xl font-bold my-4">Location Search</h1>
-      <div ref={mapRef} style={{ width: '100%', height: '400px' }} className="mb-4"></div>
-      <form onSubmit={handleSubmit} className="mb-4">
-        {error && <p className="text-red-500 mb-2">{error}</p>}
-        <div className="flex flex-wrap -mx-2 mb-4">
+      <h1 className="text-3xl font-bold my-6">Location Search</h1>
+      <div ref={mapRef} style={{ width: '100%', height: '400px' }} className="mb-6"></div>
+      <form onSubmit={handleSubmit} className="mb-6">
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <div className="flex flex-wrap -mx-2 mb-6">
           <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
             <input
               type="text"
@@ -72,7 +68,7 @@ function Map() {
               onChange={(e) => setLatitude(e.target.value)}
               placeholder="Latitude"
               required
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-6 py-4 border rounded-lg text-lg"
             />
           </div>
           <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
@@ -82,9 +78,10 @@ function Map() {
               onChange={(e) => setLongitude(e.target.value)}
               placeholder="Longitude"
               required
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-6 py-4 border rounded-lg text-lg"
             />
           </div>
+          {/* Radius Input */}
           <div className="w-full md:w-1/3 px-2">
             <input
               type="text"
@@ -92,35 +89,47 @@ function Map() {
               onChange={(e) => setRadius(e.target.value)}
               placeholder="Radius (mi)"
               required
-              className="w-full px-3 py-2 border rounded"
+              className="w-full px-6 py-4 border rounded-lg text-lg"
             />
           </div>
         </div>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white px-6 py-4 text-xl rounded-lg hover:bg-blue-700 transition-all"
+        >
           Search
         </button>
       </form>
       
       <div>
-        <h2 className="text-xl font-semibold mb-2">Nearby Places</h2>
+        <h2 className="text-2xl font-semibold mb-4">Nearby Places</h2>
         {places.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full table-auto">
+            <table className="w-full table-auto border-collapse">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="px-4 py-2">Name</th>
-                  <th className="px-4 py-2">Rating</th>
-                  <th className="px-4 py-2">Description</th>
-                  <th className="px-4 py-2">Website</th>
+                  <th className="px-8 py-4 text-left text-lg">Name</th>
+                  <th className="px-8 py-4 text-left text-lg">Rating</th>
+                  <th className="px-8 py-4 text-left text-lg">Description</th>
+                  <th className="px-8 py-4 text-left text-lg">Website</th>
                 </tr>
               </thead>
               <tbody>
                 {places.map((place, index) => (
-                  <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : ""}>
-                    <td className="border px-4 py-2">{place.displayName}</td>
-                    <td className="border px-4 py-2">{place.rating || 'N/A'}</td>
-                    <td className="border px-4 py-2">{place.editorialSummary?.text || 'No description available'}</td>
-                    <td className="border px-4 py-2">
+                  <tr key={index} className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"} hover:bg-gray-200 transition-all`}>
+                    <td className="border px-6 py-4 text-lg">{place.displayName}</td>
+                    <td className="border px-6 py-4 text-lg">
+                      {place.rating ? (
+                        <span className="text-yellow-500">
+                          {'★'.repeat(Math.round(place.rating))}{' '}
+                          ({place.rating.toFixed(1)})
+                        </span>
+                      ) : (
+                        'N/A'
+                      )}
+                    </td>
+                    <td className="border px-6 py-4 text-lg break-words">{place.editorialSummary?.text || 'No description available'}</td>
+                    <td className="border px-6 py-4 text-lg">
                       {place.websiteURI ? (
                         <a href={place.websiteURI} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
                           Visit Website
@@ -135,12 +144,11 @@ function Map() {
             </table>
           </div>
         ) : (
-          <p>No places found. Try searching with different parameters.</p>
+          <p className="text-lg">No places found. Try searching with different parameters.</p>
         )}
       </div>
     </div>
   );
 }
-
 
 export default Map;

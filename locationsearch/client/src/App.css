@@ -3,9 +3,10 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #1c1f24; /* Darker background */
   padding: 20px;
   color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 nav ul {
@@ -17,17 +18,65 @@ nav ul {
 
 nav ul li {
   margin: 0 10px;
+  transition: transform 0.2s; /* Scale effect on hover */
+}
+
+nav ul li:hover {
+  transform: scale(1.05); /* Scale effect */
 }
 
 nav ul li a {
-  color: white;
+  color: #61dafb; /* Better visibility */
   text-decoration: none;
+  padding: 10px 15px; /* Increase clickable area */
+  border-radius: 5px; /* Rounded corners */
+  transition: color 0.3s, background-color 0.3s; /* Smooth transitions */
+}
+
+nav ul li a:hover {
+  background-color: rgba(97, 218, 251, 0.2); /* Light background on hover */
+  color: #21a1f1; /* Change color on hover */
 }
 
 main {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .App-link {
   color: #61dafb;
+}
+
+button {
+  background-color: #61dafb; /* Primary color */
+  border: none;
+  border-radius: 5px;
+  color: white;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #21a1f1; /* Darker shade on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .App-header {
+    padding: 10px;
+  }
+
+  nav ul {
+    flex-direction: column;
+  }
+
+  nav ul li {
+    margin: 5px 0;
+  }
+
+  main {
+    padding: 10px;
+  }
 }

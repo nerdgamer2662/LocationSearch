@@ -1,57 +1,53 @@
 let map;
 let markers = [];
 export const MI_TO_METERS = 1609.344;
+const DEFAULT_ZOOM_LEVEL = 16;
+const DEFAULT_CENTER = { lat: 33.7756, lng: -84.3963 };
+const MAP_ID = "DEMO_MAP_ID";
 
 /* global google */
 
 function loadGoogleMapsScript() {
-    return new Promise((resolve, reject) => {
-      if (window.google && window.google.maps) {
-        resolve(window.google.maps);
-        return;
-      }
-  
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places`;
-      
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-      script.onload = () => resolve(window.google.maps);
-      script.onerror = () => reject(new Error('Google Maps script failed to load'));
-    });
-  }
+  return new Promise((resolve, reject) => {
+    if (window.google && window.google.maps) {
+      resolve(window.google.maps);
+      return;
+    }
 
-  // The current URL loading the Maps JavaScript API has not been added to the list of allowed referrers. Please check the referrer settings of your API key in the Cloud Console.
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+    script.onload = () => resolve(window.google.maps);
+    script.onerror = () => reject(new Error('Google Maps script failed to load'));
+  });
+}
 
 export async function initMap(mapElement, onMapClick) {
-    if (!mapElement) {
-      throw new Error("Map container element is not available");
-    }
-    
-    await loadGoogleMapsScript();
-    const georgia_tech = { lat: 33.7756, lng: -84.3963 };
-    const { Map } = await google.maps.importLibrary("maps");
-    map = new Map(mapElement, {
-      zoom: 16,
-      center: georgia_tech,
-      mapId: "DEMO_MAP_ID",
-    });
-    // Add click event listener to the map
-    // Add click event listener to the map
-    map.addListener("click", (event) => {
-        const latitude = event.latLng.lat();
-        const longitude = event.latLng.lng();
-        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-        centerMap(latitude, longitude);
-        if (onMapClick) {
-        onMapClick(latitude, longitude);
-        }
-    });
-
+  if (!mapElement) {
+    throw new Error("Map container element is not available");
   }
-  
-  
+
+  await loadGoogleMapsScript();
+  const { Map } = await google.maps.importLibrary("maps");
+  map = new Map(mapElement, {
+    zoom: DEFAULT_ZOOM_LEVEL,
+    center: DEFAULT_CENTER,
+    mapId: MAP_ID,
+  });
+
+  // Add click event listener to the map
+  map.addListener("click", (event) => {
+    const latitude = event.latLng.lat();
+    const longitude = event.latLng.lng();
+    console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+    centerMap(latitude, longitude);
+    if (onMapClick) {
+      onMapClick(latitude, longitude);
+    }
+  });
+}
 
 export function centerMap(latitude, longitude) {
   if (map) {
@@ -60,8 +56,9 @@ export function centerMap(latitude, longitude) {
 }
 
 export async function nearbySearch(latitude, longitude, radius) {
+  try {
     const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
-    let center = new google.maps.LatLng(latitude, longitude);
+    const center = new google.maps.LatLng(latitude, longitude);
     const request = {
       fields: ["displayName", "location", 'rating', 'websiteURI', 'editorialSummary'],
       locationRestriction: {
@@ -72,48 +69,53 @@ export async function nearbySearch(latitude, longitude, radius) {
       maxResultCount: 5,
       rankPreference: SearchNearbyRankPreference.POPULARITY,
     };
-  
+
     const { places } = await Place.searchNearby(request);
     deleteMarkers();
-  
+
     if (places.length) {
       const bounds = new google.maps.LatLngBounds();
-      places.forEach((place) => {
-        addMarker(place);
-        bounds.extend(place.location);
-      });
+      places.forEach(addMarker);
+      places.forEach(place => bounds.extend(place.location));
       map.fitBounds(bounds);
     } else {
-      console.log("No results");
+      console.log("No results found.");
     }
-  
+
     return places;
+  } catch (error) {
+    console.error("Error during nearby search:", error);
+    throw new Error("Failed to perform nearby search. Please try again.");
   }
-  
+}
 
 function addMarker(place) {
-  if (map) {
-    const marker = new google.maps.Marker({
-      map,
-      position: place.location,
-      title: place.displayName,
-    });
+  if (!map) return; // Ensure map is initialized
 
-    const infoWindow = new google.maps.InfoWindow({
-      content: `
-        <h3>${place.displayName}</h3>
-        <p>Rating: ${place.rating || 'N/A'}</p>
-        <p>${place.editorialSummary || ''}</p>
-        <p><a href="${place.websiteURI || '#'}" target="_blank">Website</a></p>
-      `,
-    });
+  const marker = new google.maps.Marker({
+    map,
+    position: place.location,
+    title: place.displayName,
+  });
 
-    marker.addListener("click", () => {
-      infoWindow.open(map, marker);
-    });
+  const infoWindow = new google.maps.InfoWindow({
+    content: createInfoWindowContent(place),
+  });
 
-    markers.push(marker);
-  }
+  marker.addListener("click", () => {
+    infoWindow.open(map, marker);
+  });
+
+  markers.push(marker);
+}
+
+function createInfoWindowContent(place) {
+  return `
+    <h3>${place.displayName}</h3>
+    <p>Rating: ${place.rating || 'N/A'}</p>
+    <p>${place.editorialSummary || ''}</p>
+    <p><a href="${place.websiteURI || '#'}" target="_blank">Website</a></p>
+  `;
 }
 
 function deleteMarkers() {
