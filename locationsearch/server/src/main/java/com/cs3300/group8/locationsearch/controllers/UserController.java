@@ -30,7 +30,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         User existingUser = userRepository.findByUsername(loginRequest.getUsername());
-        if (existingUser == null || !existingUser.getPassword().equals(loginRequest.getPassword())) {
+        if (existingUser == null || !existingUser.checkPassword(loginRequest.getPassword())) {
             return ResponseEntity.badRequest().body("Invalid username or password");
         }
         return ResponseEntity.ok(existingUser);
