@@ -1,11 +1,14 @@
 package com.cs3300.group8.locationsearch.model;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+
 
 @Entity
 @Table(name = "users")
@@ -18,7 +21,9 @@ public class User {
     private String username;
 
     @Column(nullable = false)
-    private String password;
+    private String hashedPassword;
+
+    private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // Default constructor
     public User() {
@@ -27,7 +32,7 @@ public class User {
     // Constructor with username and password
     public User(String username, String password) {
         this.username = username;
-        this.password = password;
+        this.setPassword(password);
     }
 
     //Getters and setters
@@ -47,11 +52,11 @@ public class User {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;    
+    public void setPassword(String password) {
+        this.hashedPassword = passwordEncoder.encode(password);
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public boolean checkPassword(String password) {
+        return passwordEncoder.matches(password, this.hashedPassword);
     }
 }

@@ -46,3 +46,6 @@ yarn-error.log*
 target/
 HELP.md
 
+
+#Do not upload database to Git
+locationsearch/server/data/*.db

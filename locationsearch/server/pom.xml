@@ -64,6 +64,11 @@
 			<artifactId>spring-security-oauth2-jose</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+		</dependency>
+
 		<!-- Add JPA dependency -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
