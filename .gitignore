@@ -36,3 +36,4 @@ yarn-error.log*
 /locationsearch/server/src/main/java/com/cs3300/group8/locationsearch/security/
 
 target/
+HELP.md
