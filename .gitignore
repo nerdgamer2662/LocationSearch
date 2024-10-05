@@ -40,3 +40,9 @@ yarn-error.log*
 # Project-specific paths
 /locationsearch/server/src/main/java/com/cs3300/group8/locationsearch/payload/
 /locationsearch/server/src/main/java/com/cs3300/group8/locationsearch/security/
+/locationsearch/server/src/main/java/com/cs3300/group8/locationsearch/payload/
+/locationsearch/server/src/main/java/com/cs3300/group8/locationsearch/security/
+
+target/
+HELP.md
+
