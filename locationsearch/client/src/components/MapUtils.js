@@ -24,7 +24,7 @@ function loadGoogleMapsScript() {
 
   // The current URL loading the Maps JavaScript API has not been added to the list of allowed referrers. Please check the referrer settings of your API key in the Cloud Console.
 
-export async function initMap(mapElement) {
+export async function initMap(mapElement, onMapClick) {
     if (!mapElement) {
       throw new Error("Map container element is not available");
     }
@@ -37,6 +37,18 @@ export async function initMap(mapElement) {
       center: georgia_tech,
       mapId: "DEMO_MAP_ID",
     });
+    // Add click event listener to the map
+    // Add click event listener to the map
+    map.addListener("click", (event) => {
+        const latitude = event.latLng.lat();
+        const longitude = event.latLng.lng();
+        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+        centerMap(latitude, longitude);
+        if (onMapClick) {
+        onMapClick(latitude, longitude);
+        }
+    });
+
   }
   
   
@@ -48,33 +60,36 @@ export function centerMap(latitude, longitude) {
 }
 
 export async function nearbySearch(latitude, longitude, radius) {
-  const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
-  let center = new google.maps.LatLng(latitude, longitude);
-  const request = {
-    fields: ["displayName", "location", 'rating', 'websiteURI', 'editorialSummary'],
-    locationRestriction: {
-      center: center,
-      radius: radius,
-    },
-    includedPrimaryTypes: ["restaurant"],
-    maxResultCount: 5,
-    rankPreference: SearchNearbyRankPreference.POPULARITY,
-  };
-
-  const { places } = await Place.searchNearby(request);
-  deleteMarkers();
-
-  if (places.length) {
-    const bounds = new google.maps.LatLngBounds();
-    places.forEach((place) => {
-      addMarker(place);
-      bounds.extend(place.location);
-    });
-    map.fitBounds(bounds);
-  } else {
-    console.log("No results");
+    const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
+    let center = new google.maps.LatLng(latitude, longitude);
+    const request = {
+      fields: ["displayName", "location", 'rating', 'websiteURI', 'editorialSummary'],
+      locationRestriction: {
+        center: center,
+        radius: radius,
+      },
+      includedPrimaryTypes: ["restaurant"],
+      maxResultCount: 5,
+      rankPreference: SearchNearbyRankPreference.POPULARITY,
+    };
+  
+    const { places } = await Place.searchNearby(request);
+    deleteMarkers();
+  
+    if (places.length) {
+      const bounds = new google.maps.LatLngBounds();
+      places.forEach((place) => {
+        addMarker(place);
+        bounds.extend(place.location);
+      });
+      map.fitBounds(bounds);
+    } else {
+      console.log("No results");
+    }
+  
+    return places;
   }
-}
+  
 
 function addMarker(place) {
   if (map) {
