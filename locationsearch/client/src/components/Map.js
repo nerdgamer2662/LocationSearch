@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { initMap, centerMap, nearbySearch, MI_TO_METERS } from "../components/MapUtils";
+import { initMap, centerMap, nearbySearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
 
 function Map() {
   const [latitude, setLatitude] = useState("");
@@ -9,6 +9,10 @@ function Map() {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [places, setPlaces] = useState([]);
   const mapRef = useRef(null);
+
+  const [ratingSort, setRatingSort] = useState(false)
+  const [priceSort, setPriceSort] = useState(false)
+  const [distSort, setDistSort] = useState(false)
 
   useEffect(() => {
     const loadMap = async () => {
@@ -47,7 +51,57 @@ function Map() {
 
       centerMap(lat, lng);
       const foundPlaces = await nearbySearch(lat, lng, rad);
-      setPlaces(foundPlaces);
+      let filteredPlaces = foundPlaces;
+      //Filters Returned List: Price/Rating
+      console.log(priceSort)
+      console.log(ratingSort)
+      console.log(filteredPlaces);
+
+      if (ratingSort)
+      {
+        console.log("Sorting By Rating")
+        filteredPlaces.sort((min, max) => (max.rating || 0) - (min.rating || 0));
+      }
+      else {
+        console.log(" NOT Sorting By Rating")
+      }
+
+      filteredPlaces.forEach((place) => {
+        console.log(`Place: ${place.name}, Rating: ${place.rating !== undefined ? place.rating : 'Not Available'}`);
+      });
+
+      filteredPlaces.forEach((place) => {
+        console.log(`Place: ${place.name}, Price Level: ${place.price_level !== undefined ? place.price_level : 'Not Available'}`);
+      });
+
+      if (priceSort)
+      {
+        filteredPlaces.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
+      }
+  
+      if (distSort)
+      {
+
+  
+        filteredPlaces.forEach((place) => {
+          const center_location = {lat, lng};
+          const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
+          place.distance = haversine_distance(center_location, place_location);
+        })
+        filteredPlaces.forEach((place) => {
+          console.log(`Distance: ${place.name}, Distance: ${place.distance !== undefined ? place.distance : 'Not Available'}`);
+        });
+
+        filteredPlaces.sort((min, max) => (min.distance || 0) - (max.distance || 0));
+
+        filteredPlaces.forEach((place) => {
+          console.log(`Sorted Distance: ${place.name}, Distance: ${place.distance !== undefined ? place.distance : 'Not Available'}`);
+        });
+      }
+
+      console.log(filteredPlaces);
+
+      setPlaces(filteredPlaces);
     } catch (err) {
       console.error("Error during search:", err);
       setError("An error occurred during search. Please try again.");
@@ -80,6 +134,34 @@ function Map() {
               required
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
+          </div>
+          <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
+            <input
+              type="checkbox"
+              id="ratingSort"
+              checked={ratingSort}
+              onChange={(e) => setRatingSort(e.target.checked)}
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            />
+            <label htmlFor = "ratingSort" className="ml-2">Sort by Rating </label>
+          </div>
+          <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
+            <input
+              type="checkbox"
+              checked={priceSort}
+              onChange={(e) => setPriceSort(e.target.checked)}
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            />
+            <label htmlFor = "priceSort" className="ml-2">TODO: Sort by Price (Need to make extra call to Maps Details API)</label>
+          </div>
+          <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
+            <input
+              type="checkbox"
+              checked={distSort}
+              onChange={(e) => setDistSort(e.target.checked)}
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            />
+            <label htmlFor = "distSort" className="ml-2">TODO: Sort by Distance</label>
           </div>
           {/* Radius Input */}
           <div className="w-full md:w-1/3 px-2">
