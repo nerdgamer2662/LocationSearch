@@ -51,4 +51,4 @@ HELP.md
 locationsearch/server/data/*.db
 locationsearch/server/node_modules/
 
-locationsearch/client/src/secrets/process.env
+.env
