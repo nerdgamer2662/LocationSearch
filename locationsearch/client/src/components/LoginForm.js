@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./LoginForm.css";
+import { API_BASE_URL } from "../config";
+
 
 function LoginForm() {
   const [username, setUsername] = useState("");
@@ -12,7 +14,11 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/login", { username, password });
+      const response = await axios.post(
+        `${API_BASE_URL}/api/users/login`,
+        { username, password },
+        { withCredentials: true }
+      );
       const { token } = response.data; // Assuming the token is in response.data.token
       localStorage.setItem("token", token);
       localStorage.setItem("username", username); // Store the username
