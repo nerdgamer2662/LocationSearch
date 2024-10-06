@@ -15,6 +15,7 @@ function LoginForm() {
       const response = await axios.post("/api/login", { username, password });
       const { token } = response.data; // Assuming the token is in response.data.token
       localStorage.setItem("token", token);
+      localStorage.setItem("username", username); // Store the username
 
       alert("Login successful!");
       navigate("/dashboard");

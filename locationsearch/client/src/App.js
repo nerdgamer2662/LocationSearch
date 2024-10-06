@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import LandingPage from "./components/LandingPage";
 import SignUpForm from "./components/SignUpForm";
 import LoginForm from "./components/LoginForm";
-import Dashboard from "./components/Dashboard"; // Import the Dashboard component
-import Map from "./components/Map"; // Import the Dashboard component
+import Dashboard from "./components/Dashboard";
+import Map from "./components/Map";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      // Assuming the username is stored in localStorage for simplicity
+      const storedUsername = localStorage.getItem("username");
+      setIsLoggedIn(true);
+      setUsername(storedUsername);
+    }
+  }, []);
+
   return (
     <Router>
       <div className="App">
@@ -29,6 +42,13 @@ function App() {
               </li>
             </ul>
           </nav>
+          <div className="auth-status">
+            {isLoggedIn ? (
+              <p>Welcome, {username}!</p>
+            ) : (
+              <p>You are not logged in.</p>
+            )}
+          </div>
         </header>
 
         <main>
@@ -37,8 +57,7 @@ function App() {
             <Route path="/signup" element={<SignUpForm />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/map" element={<ProtectedRoute><Map /></ProtectedRoute>} />{" "}
-            {/* Add this line */}
+            <Route path="/map" element={<ProtectedRoute><Map /></ProtectedRoute>} />
           </Routes>
         </main>
       </div>
