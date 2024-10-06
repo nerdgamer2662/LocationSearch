@@ -50,3 +50,5 @@ HELP.md
 #Do not upload database to Git
 locationsearch/server/data/*.db
 locationsearch/server/node_modules/
+
+locationsearch/client/src/secrets/process.env
