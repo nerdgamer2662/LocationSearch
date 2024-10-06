@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { initMap, centerMap, nearbySearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
-import { getSynonyms } from "../components/GPTRequest";
+import { initMap, centerMap, processPlaces, nearbySearch, detailSearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
+//import { getSynonyms } from "../components/GPTRequest";
 
 function Map() {
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [radius, setRadius] = useState("");
+  const [latitude, setLatitude] = useState(33.7756);
+  const [longitude, setLongitude] = useState(-84.3963);
+  const [radius, setRadius] = useState(20);
   const [error, setError] = useState("");
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [places, setPlaces] = useState([]);
@@ -64,19 +64,52 @@ function Map() {
       
       const searchTypes = [...placeTypes];
 
+      /*
       let adjustedType = await getSynonyms(placeType);
 
       if (adjustedType.trim() !== "") {
         searchTypes.push(adjustedType.trim().toLowerCase().replace(/\s+/g, '_'));
       }
-      
+      */
+
+      if (placeType.trim() !== "") {
+        searchTypes.push(placeType.trim().toLowerCase().replace(/\s+/g, '_'));
+      }
+     
       let foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
 
       foundPlaces.forEach((place) => {
         const center_location = {lat, lng};
         const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
         place.distance = haversine_distance(center_location, place_location);
+
       });
+
+      foundPlaces.forEach((place) => {
+        const center_location = {lat, lng};
+        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
+        place.distance = haversine_distance(center_location, place_location);
+
+      });
+
+      let price_results = await processPlaces(foundPlaces);
+      
+      let index = 0;
+      price_results.forEach((price) => {
+        if (!price)
+        {
+          price = 0;
+        }
+        foundPlaces[index].price_level = price;
+        index = index + 1;
+      });
+      
+      foundPlaces.forEach((place) => {
+        const center_location = {lat, lng};
+        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
+        place.distance = haversine_distance(center_location, place_location);
+      });
+
 
       switch (sortOption) {
         case "rating":
@@ -86,7 +119,9 @@ function Map() {
           foundPlaces.sort((a, b) => (a.distance || 0) - (b.distance || 0));
           break;
         case 'price':
-          foundPlaces.sort((a, b) => (b.price_level || 0) - (a.price_level || 0));
+
+          foundPlaces.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
+    
           break;
         default:
           // No sorting
@@ -221,6 +256,7 @@ function Map() {
                   <th className="px-8 py-4 text-left text-lg">Description</th>
                   <th className="px-8 py-4 text-left text-lg">Website</th>
                   <th className="px-8 py-4 text-left text-lg">Distance (mi)</th>
+                  <th className="px-8 py-4 text-left text-lg">Price Level (1 Low, 4 High)</th>
                 </tr>
               </thead>
               <tbody>
@@ -249,6 +285,7 @@ function Map() {
                       )}
                     </td>
                     <td className="border px-6 py-4 text-lg">{place.distance.toFixed(2)}</td>
+                    <td className="border px-6 py-4 text-lg">{place.price_level}</td>
                   </tr>
                 ))}
               </tbody>

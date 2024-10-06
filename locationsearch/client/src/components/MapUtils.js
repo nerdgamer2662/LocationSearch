@@ -82,11 +82,50 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
       console.log("No results found.");
     }
 
+    places.forEach(place => {
+      console.log('Place ID:', place.id);  // Correctly access place_id here
+    });
+
     return places;
   } catch (error) {
     console.error("Error during nearby search:", error);
     throw new Error("Failed to perform nearby search. Please try again.");
   }
+}
+
+export async function detailSearch(place_id) {
+
+  console.log("place_id");
+  console.log(place_id);
+  const service = new google.maps.places.PlacesService(map);
+  const request = {
+    placeId: place_id,
+    fields: ['price_level']
+  };
+
+  // Wrapping the getDetails call in a Promise
+  return new Promise((resolve, reject) => {
+    service.getDetails(request, (place, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK) {
+        resolve(place.price_level);  // Resolve the promise with price_level
+      } else {
+        reject(new Error('Failed to fetch place details'));  // Reject in case of an error
+      }
+    });
+  });
+}
+
+export async function processPlaces(results) {
+  let price_list = [];
+  for (const specific_place of results) {
+    try {
+      specific_place.price_level = await detailSearch(specific_place.id);
+      price_list.push(specific_place.price_level);
+    } catch (error) {
+      console.error('Error fetching price level for place:', specific_place.name, error);
+    }
+  }
+  return price_list;
 }
 
 function addMarker(place) {
