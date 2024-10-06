@@ -33,7 +33,7 @@ body {
   
   .hero-section {
     background: url('../image/Desktop Photo Old Quad.jpg') no-repeat center center/cover;
-    height: 80vh;
+    height: 90vh;
     display: flex;
     align-items: center;
     justify-content: center;
