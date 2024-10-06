@@ -82,38 +82,38 @@ function Map() {
         console.log(filtered_results);
       }
 
-      console.log(filteredPlaces);
+      console.log(filtered_results);
 
       console.log(sortOption);
       switch (sortOption) {
         case "rating":
           console.log("Sorting By Rating");
-          filteredPlaces.sort((min, max) => (max.rating || 0) - (min.rating || 0));
+          filtered_results.sort((min, max) => (max.rating || 0) - (min.rating || 0));
 
-          filteredPlaces.forEach((place) => {
+          filtered_results.forEach((place) => {
             console.log(`Place: ${place.name}, Rating: ${place.rating !== undefined ? place.rating : 'Not Available'}`);
           });
     
           break;
         case 'distance':
           console.log("Sorting By Distance")
-          filteredPlaces.forEach((place) => {
+          filtered_results.forEach((place) => {
             const center_location = {lat, lng};
             const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
             place.distance = haversine_distance(center_location, place_location);
           })
   
-          filteredPlaces.sort((min, max) => (min.distance || 0) - (max.distance || 0));
+          filtered_results.sort((min, max) => (min.distance || 0) - (max.distance || 0));
 
-          filteredPlaces.forEach((place) => {
+          filtered_results.forEach((place) => {
             console.log(`Place: ${place.name}, Distance: ${place.distance !== undefined ? place.distance : 'Not Available'}`);
           });
 
           break;
         case 'price':
-          filteredPlaces.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
+          filtered_results.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
 
-          filteredPlaces.forEach((place) => {
+          filtered_results.forEach((place) => {
             console.log(`Place: ${place.name}, Price Level: ${place.price_level !== undefined ? place.price_level : 'Not Available'}`);
           });
     
@@ -122,10 +122,10 @@ function Map() {
           console.log('No Sorting');
       }
 
-      console.log(filteredPlaces);
+      console.log(filtered_results);
 
       
-      setPlaces(filteredPlaces);
+      setPlaces(filtered_results);
 
     } catch (err) {
       console.error("Error during search:", err);
