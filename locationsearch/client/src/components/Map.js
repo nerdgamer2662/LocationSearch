@@ -18,6 +18,9 @@ function Map() {
   const [distSort, setDistSort] = useState(false);
   const [sortOption, sortOptionHandler] = useState("");
 
+  const [numPlaces, setNumPlaces] = useState(10);
+
+
   useEffect(() => {
     const loadMap = async () => {
       if (mapRef.current) {
@@ -124,8 +127,18 @@ function Map() {
 
       console.log(filtered_results);
 
-      
+      let numResults = numPlaces;
+      if (numResults > 20) {
+        numResults = 20;
+      }
+      if (numResults <= 0) {
+        numResults = 1;
+      }
+
+      console.log(numResults);
+      filtered_results = filtered_results.slice(0, numResults);
       setPlaces(filtered_results);
+
 
     } catch (err) {
       console.error("Error during search:", err);
@@ -185,6 +198,17 @@ function Map() {
               onChange={(e) => setRadius(e.target.value)}
               placeholder="Radius (mi)"
               required
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            />
+          </div>
+          <div className="w-full md:w-1/3 px-2">
+            <input
+              type="number"
+               min="1"
+              max="20"
+              value={numPlaces}
+              onChange={(e) => setNumPlaces(e.target.value)}
+              placeholder="Results per Search"
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
           </div>
