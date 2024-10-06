@@ -10,6 +10,9 @@ function Map() {
   const [places, setPlaces] = useState([]);
   const mapRef = useRef(null);
 
+  const [placeType_restaurant, settype_restaurant] = useState(false);
+  const [placeType_tourist, settype_tourist] = useState(false);
+
   useEffect(() => {
     const loadMap = async () => {
       if (mapRef.current) {
@@ -47,7 +50,33 @@ function Map() {
 
       centerMap(lat, lng);
       const foundPlaces = await nearbySearch(lat, lng, rad);
-      setPlaces(foundPlaces);
+
+      let filtered_results = foundPlaces;
+
+      if (placeType_restaurant || placeType_tourist) {
+
+        console.log("Filtering for Type");
+        console.log(filtered_results);
+
+        let types = []
+
+        if (placeType_restaurant) {
+          let restaurant_results = foundPlaces.filter((place) => {return place.types.includes("restaurant");});
+          filtered_results.concat(restaurant_results);
+        }
+
+        if (placeType_tourist) {
+          let tourist_results = foundPlaces.filter((place) => {return place.types.includes("tourist_attraction");});
+          filtered_results.concat(tourist_results);
+        }
+
+        filtered_results = filtered_results.filter(types.some(type => filtered_results.includes(type)));
+
+        console.log("Result of Filtering");
+        console.log(filtered_results);
+      }
+
+      setPlaces(filtered_results);
     } catch (err) {
       console.error("Error during search:", err);
       setError("An error occurred during search. Please try again.");
@@ -92,7 +121,28 @@ function Map() {
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
           </div>
+          <div className="w-full md:w-1/3 px-2">
+            <input
+              type="checkbox"
+              id="filter_restaurant"
+              checked={placeType_restaurant}
+              onChange={(e) => settype_restaurant(e.target.checked)}
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            />
+            <label htmlFor="filter_restaurant" className="ml-2">Filter Restaurant</label>
+          </div>
+          <div className="w-full md:w-1/3 px-2">
+            <input
+              type="checkbox"
+              id="filter_tourist"
+              checked={placeType_tourist}
+              onChange={(e) => settype_tourist(e.target.checked)}
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            />
+            <label htmlFor="placeType_tourist" className="ml-2">Filter Tourist Attraction</label>
+          </div>
         </div>
+        
         <button
           type="submit"
           className="w-full bg-blue-600 text-white px-6 py-4 text-xl rounded-lg hover:bg-blue-700 transition-all"
@@ -109,6 +159,7 @@ function Map() {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="px-8 py-4 text-left text-lg">Name</th>
+                  <th className="px-8 py-4 text-left text-lg">Type</th>
                   <th className="px-8 py-4 text-left text-lg">Rating</th>
                   <th className="px-8 py-4 text-left text-lg">Description</th>
                   <th className="px-8 py-4 text-left text-lg">Website</th>
@@ -118,6 +169,7 @@ function Map() {
                 {places.map((place, index) => (
                   <tr key={index} className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"} hover:bg-gray-200 transition-all`}>
                     <td className="border px-6 py-4 text-lg">{place.displayName}</td>
+                    <td className="border px-6 py-4 text-lg">{place.types}</td>
                     <td className="border px-6 py-4 text-lg">
                       {place.rating ? (
                         <span className="text-yellow-500">
