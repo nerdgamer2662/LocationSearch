@@ -55,20 +55,18 @@ export function centerMap(latitude, longitude) {
   }
 }
 
-export async function nearbySearch(latitude, longitude, radius) {
+export async function nearbySearch(latitude, longitude, radius, placeTypes) {
   try {
     const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
     const center = new google.maps.LatLng(latitude, longitude);
     const request = {
-      fields: ["displayName", "location", 'rating', 'websiteURI', 'editorialSummary', 'types'],
+      fields: ["displayName", "location", 'rating', 'websiteURI', 'editorialSummary', 'types', 'priceLevel'],
       locationRestriction: {
         center: center,
         radius: radius,
       },
-
-      includedPrimaryTypes: ["restaurant", "bar", "cafe", "tourist_attraction"],
+      includedPrimaryTypes: placeTypes.length > 0 ? placeTypes : undefined,
       maxResultCount: 20,
-
       rankPreference: SearchNearbyRankPreference.POPULARITY,
     };
 
@@ -113,10 +111,13 @@ function addMarker(place) {
 
 function createInfoWindowContent(place) {
   return `
-    <h3>${place.displayName}</h3>
-    <p>Rating: ${place.rating || 'N/A'}</p>
-    <p>${place.editorialSummary || ''}</p>
-    <p><a href="${place.websiteURI || '#'}" target="_blank">Website</a></p>
+    <div>
+      <h3>${place.displayName}</h3>
+      <p>Rating: ${place.rating ? `${place.rating.toFixed(1)} / 5` : 'N/A'}</p>
+      ${place.priceLevel ? `<p>Price Level: ${place.priceLevel}</p>` : ''}
+      ${place.editorialSummary ? `<p>${place.editorialSummary.text}</p>` : ''}
+      ${place.websiteURI ? `<p><a href="${place.websiteURI}" target="_blank">Website</a></p>` : ''}
+    </div>
   `;
 }
 
@@ -125,7 +126,6 @@ function deleteMarkers() {
   markers = [];
 }
 
-//Created by Vijay Shastri
 export function haversine_distance(pos1, pos2) {
   var R = 3958.8; // Radius of the Earth in miles
   var rlat1 = pos1.lat * (Math.PI/180); // Convert degrees to radians
@@ -133,5 +133,5 @@ export function haversine_distance(pos1, pos2) {
   var difflat = rlat2-rlat1; // Radian difference (latitudes)
   var difflon = (pos2.lng-pos1.lng) * (Math.PI/180); // Radian difference (longitudes)
   var d = 2 * R * Math.asin(Math.sqrt(Math.sin(difflat/2)*Math.sin(difflat/2)+Math.cos(rlat1)*Math.cos(rlat2)*Math.sin(difflon/2)*Math.sin(difflon/2)));
-  return +(d.toFixed(1));
+  return d;
 }
