@@ -1,82 +1,44 @@
-.App {
-  text-align: center;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
 
 .App-header {
-  background-color: #1c1f24; /* Darker background */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 20px;
-  color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  background-color: #282c34;
 }
 
-nav ul {
-  list-style-type: none;
+.App-header nav {
+  flex: 1;
+}
+
+.App-header nav ul {
+  list-style: none;
   padding: 0;
   display: flex;
   justify-content: center;
+  margin: 0;
 }
 
-nav ul li {
-  margin: 0 10px;
-  transition: transform 0.2s; /* Scale effect on hover */
+.App-header nav ul li {
+  margin: 0 15px;
 }
 
-nav ul li:hover {
-  transform: scale(1.05); /* Scale effect */
-}
-
-nav ul li a {
-  color: #61dafb; /* Better visibility */
+.App-header nav ul li a {
+  color: white;
   text-decoration: none;
-  padding: 10px 15px; /* Increase clickable area */
-  border-radius: 5px; /* Rounded corners */
-  transition: color 0.3s, background-color 0.3s; /* Smooth transitions */
+  font-size: 18px;
 }
 
-nav ul li a:hover {
-  background-color: rgba(97, 218, 251, 0.2); /* Light background on hover */
-  color: #21a1f1; /* Change color on hover */
+.auth-status {
+  color: white;
+  font-size: 18px;
+  margin-left: auto;
 }
 
 main {
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-button {
-  background-color: #61dafb; /* Primary color */
-  border: none;
-  border-radius: 5px;
-  color: white;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #21a1f1; /* Darker shade on hover */
-}
-
-/* Responsive Design */
-@media (max-width: 600px) {
-  .App-header {
-    padding: 10px;
-  }
-
-  nav ul {
-    flex-direction: column;
-  }
-
-  nav ul li {
-    margin: 5px 0;
-  }
-
-  main {
-    padding: 10px;
-  }
 }

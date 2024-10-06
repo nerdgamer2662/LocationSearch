@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./SignUpForm.css";
+import { API_BASE_URL } from "../config";
+
 
 function SignUpForm() {
   const [username, setUsername] = useState("");
@@ -17,9 +19,17 @@ function SignUpForm() {
       return;
     }
     try {
-      const response = await axios.post("/api/signup", { username, password });
+      const response = await axios.post(
+        `${API_BASE_URL}/api/users/signup`,
+        { username, password },
+        { withCredentials: true }
+      );
+      alert("Sign up successful!");
       const { token } = response.data; // Assuming the token is in response.data.token
       localStorage.setItem("token", token);
+      localStorage.setItem("username", username); // Store the username
+      navigate("/login");
+
 
       alert("Sign Up successful!");
       navigate("/dashboard");
@@ -32,6 +42,8 @@ function SignUpForm() {
     <div className="signup-container">
       <form onSubmit={handleSubmit} className="signup-form">
         {error && <p className="error">{error}</p>}
+        <h1>Sign Up</h1>
+        <p>Enter your credentials to use the Map Page</p>
         <input
           type="text"
           value={username}
