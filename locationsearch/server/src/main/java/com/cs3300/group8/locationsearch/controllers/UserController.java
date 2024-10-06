@@ -24,7 +24,7 @@ import javax.crypto.SecretKey;
 public class UserController {
     @Autowired
     private UserRepository userRepository;
-    private static final String SECRET_KEY = "your-secret-key"; // Keep this secret
+    private static final String SECRET_KEY = "d)H!LWh{7%txM[24#]Pwaj3A~pZ;c@+U"; // Keep this secret
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signupRequest) {
@@ -70,7 +70,7 @@ public class UserController {
                 .setSubject(user.getUsername())  // Store the username in the token
                 .setIssuedAt(new Date())         // Set the current time as the issued time
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime)) // Set expiration time
-                .signWith(key, SignatureAlgorithm.HS512) // Sign the token with the SecretKey and algorithm
+                .signWith(key, SignatureAlgorithm.HS256) // Sign the token with the SecretKey and algorithm
                 .compact();  // Generate the token
     }
 

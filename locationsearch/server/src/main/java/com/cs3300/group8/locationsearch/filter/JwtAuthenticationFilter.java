@@ -3,66 +3,71 @@ package com.cs3300.group8.locationsearch.filter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 
-
-
-// Custom filter to verify JWT on each request
+// JwtAuthenticationFilter that checks for JWT in the Authorization header
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String SECRET_KEY = "your-secret-key"; // Replace with a secure key
+    //private final UserDetailsService userDetailsService;
+    private final SecretKey secretKey;
 
-    private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
-    
-
-    @Autowired
-    private UserDetailsService userDetailsService; // Autowire UserDetailsService to load user data
+    // Constructor with dependencies
+    public JwtAuthenticationFilter() {
+        //this.userDetailsService = userDetailsService;
+        this.secretKey = Keys.hmacShaKeyFor("d)H!LWh{7%txM[24#]Pwaj3A~pZ;c@+U".getBytes());  // Convert secret key to SecretKey
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws IOException, ServletException {
+            throws ServletException, IOException {
 
-        // Extract the Authorization header
         String authorizationHeader = request.getHeader("Authorization");
 
-        // If no Authorization header is found or it doesn't start with "Bearer", continue the filter chain
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Extract the token from the header (remove the "Bearer " prefix)
         String token = authorizationHeader.substring(7);
 
         try {
-            // Parse and validate the JWT
             Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)  // Use the secret key to validate the signature
-                    .build()  // Build the parser
-                    .parseClaimsJws(token)  // Parse the token
-                    .getBody();  // Extract the claims
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
 
-            // You can retrieve user details from the claims and set it in the security context (optional)
             String username = claims.getSubject();
-            // Optionally set the authentication in SecurityContextHolder for further use
+
+            // If needed, you can extract additional claims, like roles:
+            String roles = (String) claims.get("roles");  // Example of extracting a custom claim for roles
+
+            // Create an authentication object directly using the JWT claims
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    username, null, new ArrayList<>());  // You can set authorities here if needed
+
+            // Set the authentication object in the security context
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (Exception e) {
-            // If JWT is invalid or expired, respond with an unauthorized status
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        // Continue the filter chain if the JWT is valid
         filterChain.doFilter(request, response);
     }
 }
