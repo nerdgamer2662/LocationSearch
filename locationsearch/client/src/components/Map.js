@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { initMap, centerMap, processPlaces, nearbySearch, detailSearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
+import { getSynonyms } from "../components/GPTRequest";
 
 function Map() {
   const [latitude, setLatitude] = useState(33.7756);
@@ -10,16 +11,10 @@ function Map() {
   const [places, setPlaces] = useState([]);
   const mapRef = useRef(null);
 
-
-  const [placeType_restaurant, settype_restaurant] = useState(false);
-  const [placeType_tourist, settype_tourist] = useState(false);
-  const [ratingSort, setRatingSort] = useState(false);
-  const [priceSort, setPriceSort] = useState(false);
-  const [distSort, setDistSort] = useState(false);
-  const [sortOption, sortOptionHandler] = useState("");
-
+  const [placeType, setPlaceType] = useState("");
+  const [placeTypes, setPlaceTypes] = useState([]);
   const [numPlaces, setNumPlaces] = useState(10);
-
+  const [sortOption, setSortOption] = useState("");
 
   useEffect(() => {
     const loadMap = async () => {
@@ -42,6 +37,17 @@ function Map() {
     centerMap(lat, lng);
   };
 
+  const handlePlaceTypeChange = (e) => {
+    setPlaceType(e.target.value);
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    setPlaceTypes(prev => 
+      checked ? [...prev, value] : prev.filter(type => type !== value)
+    );
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isMapLoaded) {
@@ -51,59 +57,36 @@ function Map() {
     try {
       const lat = parseFloat(latitude);
       const lng = parseFloat(longitude);
-      let rad = parseFloat(radius) * MI_TO_METERS; // Convert miles to meters
-
-      // Ensure radius is within the valid range
+      let rad = parseFloat(radius) * MI_TO_METERS;
       rad = Math.min(Math.max(rad, 0), 50000);
 
       centerMap(lat, lng);
-      const foundPlaces = await nearbySearch(lat, lng, rad);
+      
+      const searchTypes = [...placeTypes];
 
-      let filtered_results = foundPlaces;
+      let adjustedType = await getSynonyms(placeType);
 
-      if (placeType_restaurant || placeType_tourist) {
-
-        console.log("Filtering for Type");
-        console.log(filtered_results);
-
-
-        if (placeType_restaurant && placeType_tourist) {
-          filtered_results = filtered_results.filter((place) => {return place.types.includes("restaurant");});          
-          filtered_results = filtered_results.filter((place) => {return place.types.includes("tourist_attraction");});   
-        }
-        else {
-          if (placeType_restaurant) {
-            filtered_results = filtered_results.filter((place) => {return place.types.includes("restaurant");});          
-          }
-          else {
-            filtered_results = filtered_results.filter((place) => {return place.types.includes("tourist_attraction");});          
-          }
-        }
-
-        console.log("Result of Filtering");
-        //console.log(types);
-        console.log(filtered_results);
+      if (adjustedType.trim() !== "") {
+        searchTypes.push(adjustedType.trim().toLowerCase().replace(/\s+/g, '_'));
       }
+      
+      let foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
 
-      console.log(filtered_results);
-
-      let specific_place;
-
-      filtered_results.forEach((place) => {
+      foundPlaces.forEach((place) => {
         const center_location = {lat, lng};
         const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
         place.distance = haversine_distance(center_location, place_location);
 
       });
 
-      filtered_results.forEach((place) => {
+      foundPlaces.forEach((place) => {
         const center_location = {lat, lng};
         const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
         place.distance = haversine_distance(center_location, place_location);
 
       });
 
-      let price_results = await processPlaces(filtered_results);
+      let price_results = await processPlaces(foundPlaces);
       
       let index = 0;
       price_results.forEach((price) => {
@@ -111,63 +94,35 @@ function Map() {
         {
           price = 0;
         }
-        filtered_results[index].price_level = price;
+        foundPlaces[index].price_level = price;
         index = index + 1;
       });
-
-      console.log("price_results");
-      console.log(price_results);
-
       
+      foundPlaces.forEach((place) => {
+        const center_location = {lat, lng};
+        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
+        place.distance = haversine_distance(center_location, place_location);
+      });
 
-      console.log(sortOption);
+
       switch (sortOption) {
         case "rating":
-          console.log("Sorting By Rating");
-          filtered_results.sort((min, max) => (max.rating || 0) - (min.rating || 0));
-
-          filtered_results.forEach((place) => {
-            console.log(`Place: ${place.name}, Rating: ${place.rating !== undefined ? place.rating : 'Not Available'}`);
-          });
-    
+          foundPlaces.sort((a, b) => (b.rating || 0) - (a.rating || 0));
           break;
         case 'distance':
-          console.log("Sorting By Distance")
-  
-          filtered_results.sort((min, max) => (min.distance || 0) - (max.distance || 0));
-
-          filtered_results.forEach((place) => {
-            console.log(`Place: ${place.name}, Distance: ${place.distance !== undefined ? place.distance : 'Not Available'}`);
-          });
-
+          foundPlaces.sort((a, b) => (a.distance || 0) - (b.distance || 0));
           break;
         case 'price':
 
-          filtered_results.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
-
-          filtered_results.forEach((place) => {
-            console.log(`Place: ${place.name}, Price Level: ${place.price_level !== undefined ? place.price_level : 'Not Available'}`);
-          });
+          foundPlaces.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
     
           break;
         default:
-          console.log('No Sorting');
+          // No sorting
       }
 
-      console.log(filtered_results);
-
-      let numResults = numPlaces;
-      if (numResults > 20) {
-        numResults = 20;
-      }
-      if (numResults <= 0) {
-        numResults = 1;
-      }
-
-      console.log(numResults);
-      filtered_results = filtered_results.slice(0, numResults);
-      setPlaces(filtered_results);
-
+      let numResults = Math.min(Math.max(parseInt(numPlaces) || 10, 1), 20);
+      setPlaces(foundPlaces.slice(0, numResults));
 
     } catch (err) {
       console.error("Error during search:", err);
@@ -204,7 +159,6 @@ function Map() {
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
           </div>
-          {/* Radius Input */}
           <div className="w-full md:w-1/3 px-2">
             <label htmlFor="set_radius" className="ml-2">Search Radius: </label>
             <input
@@ -218,7 +172,6 @@ function Map() {
           </div>
           <div className="w-full md:w-1/3 px-2">
             <label htmlFor="numResults" className="ml-2">Number of Results: </label>
-
             <input
               type="number"
               min="1"
@@ -229,45 +182,53 @@ function Map() {
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
           </div>
-          <div className="w-full md:w-1/3 px-2">
-            <label htmlFor="filter_restaurant" className="ml-2">Filter Restaurant: </label>
-            <input
-              type="checkbox"
-              id="filter_restaurant"
-              checked={placeType_restaurant}
-              onChange={(e) => settype_restaurant(e.target.checked)}
-              className="w-full px-6 py-4 border rounded-lg text-lg"
-            />
-          </div>
-          <div className="w-full md:w-1/3 px-2">
-            <label htmlFor="placeType_tourist" className="ml-2">Filter Tourist Attraction: </label>
-            <input
-              type="checkbox"
-              id="filter_tourist"
-              checked={placeType_tourist}
-              onChange={(e) => settype_tourist(e.target.checked)}
-              className="w-full px-6 py-4 border rounded-lg text-lg"
-            />
-          </div>
           <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-            <label htmlFor = "sort_dropdown" className="ml-2">Choose Sorting: </label>
-
+            <label htmlFor="sort_dropdown" className="ml-2">Choose Sorting: </label>
             <select
               id="sort_dropdown"
               value={sortOption}
-              onChange={(e) => sortOptionHandler(e.target.value)}
+              onChange={(e) => setSortOption(e.target.value)}
               className="w-full px-6 py-4 border rounded-lg text-lg"
             >
-              <option value="" disabled> Select an option</option>
+              <option value="" disabled>Select an option</option>
               <option value="nothing">None</option>
               <option value="rating">Rating</option>
               <option value="distance">Distance (mi)</option>
-              <option value="price">TODO: Price</option>
+              <option value="price">Price</option>
             </select>
           </div>
         </div>
-
         
+        <div className="search-controls mb-4">
+          <input
+            type="text"
+            value={placeType}
+            onChange={handlePlaceTypeChange}
+            placeholder="Type of place"
+            className="w-full px-6 py-4 border rounded-lg text-lg mb-2"
+          />
+          <label className="checkbox-label inline-flex items-center mr-4">
+            <input
+              type="checkbox"
+              value="restaurant"
+              checked={placeTypes.includes("restaurant")}
+              onChange={handleCheckboxChange}
+              className="form-checkbox h-5 w-5 text-blue-600"
+            />
+            <span className="ml-2">Include Restaurants</span>
+          </label>
+          <label className="checkbox-label inline-flex items-center">
+            <input
+              type="checkbox"
+              value="tourist_attraction"
+              checked={placeTypes.includes("tourist_attraction")}
+              onChange={handleCheckboxChange}
+              className="form-checkbox h-5 w-5 text-blue-600"
+            />
+            <span className="ml-2">Include Tourist Attractions</span>
+          </label>
+        </div>
+
         <button
           type="submit"
           className="w-full bg-blue-600 text-white px-6 py-4 text-xl rounded-lg hover:bg-blue-700 transition-all"
@@ -317,8 +278,8 @@ function Map() {
                         'N/A'
                       )}
                     </td>
-                    <td className="border px-6 py-4 text-lg">{place.distance}</td>
                     <td className="border px-6 py-4 text-lg">{place.price_level}</td>
+                    <td className="border px-6 py-4 text-lg">{place.distance.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
