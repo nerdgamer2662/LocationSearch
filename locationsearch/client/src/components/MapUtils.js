@@ -60,13 +60,15 @@ export async function nearbySearch(latitude, longitude, radius) {
     const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
     const center = new google.maps.LatLng(latitude, longitude);
     const request = {
-      fields: ["displayName", "location", 'rating', 'websiteURI', 'editorialSummary'],
+      fields: ["displayName", "location", 'rating', 'websiteURI', 'editorialSummary', 'types'],
       locationRestriction: {
         center: center,
         radius: radius,
       },
-      includedPrimaryTypes: ["restaurant"],
-      maxResultCount: 10,
+
+      includedPrimaryTypes: ["restaurant", "bar", "cafe", "tourist_attraction"],
+      maxResultCount: 20,
+
       rankPreference: SearchNearbyRankPreference.POPULARITY,
     };
 

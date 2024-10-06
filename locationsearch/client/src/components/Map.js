@@ -10,6 +10,9 @@ function Map() {
   const [places, setPlaces] = useState([]);
   const mapRef = useRef(null);
 
+
+  const [placeType_restaurant, settype_restaurant] = useState(false);
+  const [placeType_tourist, settype_tourist] = useState(false);
   const [ratingSort, setRatingSort] = useState(false);
   const [priceSort, setPriceSort] = useState(false);
   const [distSort, setDistSort] = useState(false);
@@ -52,42 +55,65 @@ function Map() {
 
       centerMap(lat, lng);
       const foundPlaces = await nearbySearch(lat, lng, rad);
-      let filteredPlaces = foundPlaces;
-      //Filters Returned List: Price/Rating
-      console.log(priceSort)
-      console.log(ratingSort)
-      console.log(filteredPlaces);
+
+      let filtered_results = foundPlaces;
+
+      if (placeType_restaurant || placeType_tourist) {
+
+        console.log("Filtering for Type");
+        console.log(filtered_results);
+
+
+        if (placeType_restaurant && placeType_tourist) {
+          filtered_results = filtered_results.filter((place) => {return place.types.includes("restaurant");});          
+          filtered_results = filtered_results.filter((place) => {return place.types.includes("tourist_attraction");});   
+        }
+        else {
+          if (placeType_restaurant) {
+            filtered_results = filtered_results.filter((place) => {return place.types.includes("restaurant");});          
+          }
+          else {
+            filtered_results = filtered_results.filter((place) => {return place.types.includes("tourist_attraction");});          
+          }
+        }
+
+        console.log("Result of Filtering");
+        //console.log(types);
+        console.log(filtered_results);
+      }
+
+      console.log(filtered_results);
 
       console.log(sortOption);
       switch (sortOption) {
         case "rating":
           console.log("Sorting By Rating");
-          filteredPlaces.sort((min, max) => (max.rating || 0) - (min.rating || 0));
+          filtered_results.sort((min, max) => (max.rating || 0) - (min.rating || 0));
 
-          filteredPlaces.forEach((place) => {
+          filtered_results.forEach((place) => {
             console.log(`Place: ${place.name}, Rating: ${place.rating !== undefined ? place.rating : 'Not Available'}`);
           });
     
           break;
         case 'distance':
           console.log("Sorting By Distance")
-          filteredPlaces.forEach((place) => {
+          filtered_results.forEach((place) => {
             const center_location = {lat, lng};
             const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
             place.distance = haversine_distance(center_location, place_location);
           })
   
-          filteredPlaces.sort((min, max) => (min.distance || 0) - (max.distance || 0));
+          filtered_results.sort((min, max) => (min.distance || 0) - (max.distance || 0));
 
-          filteredPlaces.forEach((place) => {
+          filtered_results.forEach((place) => {
             console.log(`Place: ${place.name}, Distance: ${place.distance !== undefined ? place.distance : 'Not Available'}`);
           });
 
           break;
         case 'price':
-          filteredPlaces.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
+          filtered_results.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
 
-          filteredPlaces.forEach((place) => {
+          filtered_results.forEach((place) => {
             console.log(`Place: ${place.name}, Price Level: ${place.price_level !== undefined ? place.price_level : 'Not Available'}`);
           });
     
@@ -96,9 +122,11 @@ function Map() {
           console.log('No Sorting');
       }
 
-      console.log(filteredPlaces);
+      console.log(filtered_results);
 
-      setPlaces(filteredPlaces);
+      
+      setPlaces(filtered_results);
+
     } catch (err) {
       console.error("Error during search:", err);
       setError("An error occurred during search. Please try again.");
@@ -160,7 +188,28 @@ function Map() {
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
           </div>
+          <div className="w-full md:w-1/3 px-2">
+            <input
+              type="checkbox"
+              id="filter_restaurant"
+              checked={placeType_restaurant}
+              onChange={(e) => settype_restaurant(e.target.checked)}
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            />
+            <label htmlFor="filter_restaurant" className="ml-2">Filter Restaurant</label>
+          </div>
+          <div className="w-full md:w-1/3 px-2">
+            <input
+              type="checkbox"
+              id="filter_tourist"
+              checked={placeType_tourist}
+              onChange={(e) => settype_tourist(e.target.checked)}
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            />
+            <label htmlFor="placeType_tourist" className="ml-2">Filter Tourist Attraction</label>
+          </div>
         </div>
+        
         <button
           type="submit"
           className="w-full bg-blue-600 text-white px-6 py-4 text-xl rounded-lg hover:bg-blue-700 transition-all"
@@ -177,6 +226,7 @@ function Map() {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="px-8 py-4 text-left text-lg">Name</th>
+                  <th className="px-8 py-4 text-left text-lg">Type</th>
                   <th className="px-8 py-4 text-left text-lg">Rating</th>
                   <th className="px-8 py-4 text-left text-lg">Description</th>
                   <th className="px-8 py-4 text-left text-lg">Website</th>
@@ -187,6 +237,7 @@ function Map() {
                 {places.map((place, index) => (
                   <tr key={index} className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"} hover:bg-gray-200 transition-all`}>
                     <td className="border px-6 py-4 text-lg">{place.displayName}</td>
+                    <td className="border px-6 py-4 text-lg">{place.types}</td>
                     <td className="border px-6 py-4 text-lg">
                       {place.rating ? (
                         <span className="text-yellow-500">
