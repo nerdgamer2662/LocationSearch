@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import LandingPage from "./components/LandingPage";
@@ -7,18 +7,23 @@ import LoginForm from "./components/LoginForm";
 import Dashboard from "./components/Dashboard";
 import Map from "./components/Map";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthContext } from "../../../locationsearch/client/src/components/AuthContext";
+
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("");
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [username, setUsername] = useState("");
+  const { isLoggedIn, username, login, logout } = useContext(AuthContext);
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       // Assuming the username is stored in localStorage for simplicity
       const storedUsername = localStorage.getItem("username");
-      setIsLoggedIn(true);
-      setUsername(storedUsername);
+      login(storedUsername);
+      // setIsLoggedIn(true);
+      // setUsername(storedUsername);
     }
   }, []);
 
@@ -31,17 +36,27 @@ function App() {
               <li>
                 <Link to="/">Home</Link>
               </li>
-              <li>
-                <Link to="/signup">Sign Up</Link>
-              </li>
-              <li>
-                <Link to="/login">Login</Link>
-              </li>
+              {!isLoggedIn && (
+                <>
+                <li>
+                  <Link to="/signup">Sign Up</Link>
+                </li>
+                <li>
+                  <Link to="/login">Login</Link>
+                </li> 
+                </>
+              )
+              }
               <li>
                 <Link to="/map">Map</Link>
               </li>
             </ul>
           </nav>
+          <div className="auth-action">
+              {isLoggedIn && (
+                  <button onClick={logout} className="logout-button">Logout</button>
+              )}
+          </div>
           <div className="auth-status">
             {isLoggedIn ? (
               <p>Welcome, {username}!</p>

@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./SignUpForm.css";
 import { API_BASE_URL } from "../config";
+import { AuthContext } from "../../../../locationsearch/client/src/components/AuthContext"; //locationsearch/client/src/components/AuthContext.js
+
 
 
 function SignUpForm() {
@@ -11,6 +13,7 @@ function SignUpForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,9 +31,9 @@ function SignUpForm() {
       const { token } = response.data; // Assuming the token is in response.data.token
       localStorage.setItem("token", token);
       localStorage.setItem("username", username); // Store the username
+      login(username); // Update context
+
       navigate("/login");
-
-
       alert("Sign Up successful!");
       navigate("/dashboard");
     } catch (err) {
