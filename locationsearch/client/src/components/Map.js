@@ -58,21 +58,22 @@ function Map() {
         console.log("Filtering for Type");
         console.log(filtered_results);
 
-        let types = []
 
-        if (placeType_restaurant) {
-          let restaurant_results = foundPlaces.filter((place) => {return place.types.includes("restaurant");});
-          filtered_results.concat(restaurant_results);
+        if (placeType_restaurant && placeType_tourist) {
+          filtered_results = filtered_results.filter((place) => {return place.types.includes("restaurant");});          
+          filtered_results = filtered_results.filter((place) => {return place.types.includes("tourist_attraction");});   
         }
-
-        if (placeType_tourist) {
-          let tourist_results = foundPlaces.filter((place) => {return place.types.includes("tourist_attraction");});
-          filtered_results.concat(tourist_results);
+        else {
+          if (placeType_restaurant) {
+            filtered_results = filtered_results.filter((place) => {return place.types.includes("restaurant");});          
+          }
+          else {
+            filtered_results = filtered_results.filter((place) => {return place.types.includes("tourist_attraction");});          
+          }
         }
-
-        filtered_results = filtered_results.filter(types.some(type => filtered_results.includes(type)));
 
         console.log("Result of Filtering");
+        //console.log(types);
         console.log(filtered_results);
       }
 
