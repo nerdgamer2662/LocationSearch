@@ -10,9 +10,10 @@ function Map() {
   const [places, setPlaces] = useState([]);
   const mapRef = useRef(null);
 
-  const [ratingSort, setRatingSort] = useState(false)
-  const [priceSort, setPriceSort] = useState(false)
-  const [distSort, setDistSort] = useState(false)
+  const [ratingSort, setRatingSort] = useState(false);
+  const [priceSort, setPriceSort] = useState(false);
+  const [distSort, setDistSort] = useState(false);
+  const [sortOption, sortOptionHandler] = useState("");
 
   useEffect(() => {
     const loadMap = async () => {
@@ -57,46 +58,42 @@ function Map() {
       console.log(ratingSort)
       console.log(filteredPlaces);
 
-      if (ratingSort)
-      {
-        console.log("Sorting By Rating")
-        filteredPlaces.sort((min, max) => (max.rating || 0) - (min.rating || 0));
-      }
-      else {
-        console.log(" NOT Sorting By Rating")
-      }
+      console.log(sortOption);
+      switch (sortOption) {
+        case "rating":
+          console.log("Sorting By Rating");
+          filteredPlaces.sort((min, max) => (max.rating || 0) - (min.rating || 0));
 
-      filteredPlaces.forEach((place) => {
-        console.log(`Place: ${place.name}, Rating: ${place.rating !== undefined ? place.rating : 'Not Available'}`);
-      });
-
-      filteredPlaces.forEach((place) => {
-        console.log(`Place: ${place.name}, Price Level: ${place.price_level !== undefined ? place.price_level : 'Not Available'}`);
-      });
-
-      if (priceSort)
-      {
-        filteredPlaces.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
-      }
+          filteredPlaces.forEach((place) => {
+            console.log(`Place: ${place.name}, Rating: ${place.rating !== undefined ? place.rating : 'Not Available'}`);
+          });
+    
+          break;
+        case 'distance':
+          console.log("Sorting By Distance")
+          filteredPlaces.forEach((place) => {
+            const center_location = {lat, lng};
+            const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
+            place.distance = haversine_distance(center_location, place_location);
+          })
   
-      if (distSort)
-      {
+          filteredPlaces.sort((min, max) => (min.distance || 0) - (max.distance || 0));
 
-  
-        filteredPlaces.forEach((place) => {
-          const center_location = {lat, lng};
-          const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
-          place.distance = haversine_distance(center_location, place_location);
-        })
-        filteredPlaces.forEach((place) => {
-          console.log(`Distance: ${place.name}, Distance: ${place.distance !== undefined ? place.distance : 'Not Available'}`);
-        });
+          filteredPlaces.forEach((place) => {
+            console.log(`Place: ${place.name}, Distance: ${place.distance !== undefined ? place.distance : 'Not Available'}`);
+          });
 
-        filteredPlaces.sort((min, max) => (min.distance || 0) - (max.distance || 0));
+          break;
+        case 'price':
+          filteredPlaces.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
 
-        filteredPlaces.forEach((place) => {
-          console.log(`Sorted Distance: ${place.name}, Distance: ${place.distance !== undefined ? place.distance : 'Not Available'}`);
-        });
+          filteredPlaces.forEach((place) => {
+            console.log(`Place: ${place.name}, Price Level: ${place.price_level !== undefined ? place.price_level : 'Not Available'}`);
+          });
+    
+          break;
+        default:
+          console.log('No Sorting');
       }
 
       console.log(filteredPlaces);
@@ -136,32 +133,21 @@ function Map() {
             />
           </div>
           <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-            <input
-              type="checkbox"
-              id="ratingSort"
-              checked={ratingSort}
-              onChange={(e) => setRatingSort(e.target.checked)}
+            <label htmlFor = "sort_dropdown" className="ml-2">Choose Sorting</label>
+
+            <select
+              id="sort_dropdown"
+              value={sortOption}
+              onChange={(e) => sortOptionHandler(e.target.value)}
               className="w-full px-6 py-4 border rounded-lg text-lg"
-            />
-            <label htmlFor = "ratingSort" className="ml-2">Sort by Rating </label>
-          </div>
-          <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-            <input
-              type="checkbox"
-              checked={priceSort}
-              onChange={(e) => setPriceSort(e.target.checked)}
-              className="w-full px-6 py-4 border rounded-lg text-lg"
-            />
-            <label htmlFor = "priceSort" className="ml-2">TODO: Sort by Price (Need to make extra call to Maps Details API)</label>
-          </div>
-          <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-            <input
-              type="checkbox"
-              checked={distSort}
-              onChange={(e) => setDistSort(e.target.checked)}
-              className="w-full px-6 py-4 border rounded-lg text-lg"
-            />
-            <label htmlFor = "distSort" className="ml-2">TODO: Sort by Distance</label>
+            >
+              <option value="" disabled> Select an option</option>
+              <option value="nothing">None</option>
+              <option value="rating">Rating</option>
+              <option value="distance">Distance</option>
+              <option value="price">TODO: Price</option>
+            </select>
+            <p>Selected: {sortOption}</p>
           </div>
           {/* Radius Input */}
           <div className="w-full md:w-1/3 px-2">
@@ -194,6 +180,7 @@ function Map() {
                   <th className="px-8 py-4 text-left text-lg">Rating</th>
                   <th className="px-8 py-4 text-left text-lg">Description</th>
                   <th className="px-8 py-4 text-left text-lg">Website</th>
+                  <th className="px-8 py-4 text-left text-lg">Distance</th>
                 </tr>
               </thead>
               <tbody>
