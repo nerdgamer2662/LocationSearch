@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./LoginForm.css";
 import { API_BASE_URL } from "../config";
+import { AuthContext } from "../../../../locationsearch/client/src/components/AuthContext";
+
 
 
 function LoginForm() {
@@ -10,6 +12,8 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,6 +26,7 @@ function LoginForm() {
       const { token } = response.data; // Assuming the token is in response.data.token
       localStorage.setItem("token", token);
       localStorage.setItem("username", username); // Store the username
+      login(username); // Update context
 
       alert("Login successful!");
       navigate("/dashboard");
