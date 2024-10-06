@@ -11,11 +11,20 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cs3300.group8.locationsearch.model.User;
 import com.cs3300.group8.locationsearch.repository.UserRepository;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+
+import java.util.Date;
+
+import javax.crypto.SecretKey;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
+    private static final String SECRET_KEY = "d)H!LWh{7%txM[24#]Pwaj3A~pZ;c@+U"; // Keep this secret
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody SignupRequest signupRequest) {
@@ -33,12 +42,36 @@ public class UserController {
         if (existingUser == null || !existingUser.checkPassword(loginRequest.getPassword())) {
             return ResponseEntity.badRequest().body("Invalid username or password");
         }
-        return ResponseEntity.ok(existingUser);
+
+        // User is authenticated, now generate a JWT token
+        String token = generateJwtToken(existingUser); // Call the helper function to generate the token
+    
+        // Return the JWT token in the response
+        return ResponseEntity.ok().body("Bearer " + token);
     }
 
     @RequestMapping(method = RequestMethod.OPTIONS)
     public ResponseEntity<?> handleOptions() {
         return ResponseEntity.ok().build();
+    }
+
+    //private static final String SECRET_KEY = "your-secure-secret-key-of-proper-length"; // At least 32 characters for HS512
+
+    // Create a SecretKey from the secret string
+    private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+
+    // Helper method to generate a JWT
+    public String generateJwtToken(User user) {
+        // Set the token expiration time (e.g., 1 hour)
+        long expirationTime = 1000 * 60 * 60; // 1 hour
+
+        // Generate the JWT token with the user's information
+        return Jwts.builder()
+                .setSubject(user.getUsername())  // Store the username in the token
+                .setIssuedAt(new Date())         // Set the current time as the issued time
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime)) // Set expiration time
+                .signWith(key, SignatureAlgorithm.HS256) // Sign the token with the SecretKey and algorithm
+                .compact();  // Generate the token
     }
 
 }

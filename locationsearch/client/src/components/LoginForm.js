@@ -17,6 +17,10 @@ function LoginForm() {
         password,
       });
 
+       // Store the JWT token in localStorage (or sessionStorage)
+       const { token } = response.data; // Assuming the token is in response.data.token
+       localStorage.setItem("token", token);
+
       alert("Login successful!");
       navigate("/dashboard");
     } catch (err) {

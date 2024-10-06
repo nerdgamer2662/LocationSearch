@@ -6,6 +6,7 @@ import SignUpForm from "./components/SignUpForm";
 import LoginForm from "./components/LoginForm";
 import Dashboard from "./components/Dashboard"; // Import the Dashboard component
 import Map from "./components/Map"; // Import the Dashboard component
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -36,7 +37,7 @@ function App() {
             <Route path="/signup" element={<SignUpForm />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/map" element={<Map />} />{" "}
+            <Route path="/map" element={<ProtectedRoute><Map /></ProtectedRoute>} />{" "}
             {/* Add this line */}
           </Routes>
         </main>
