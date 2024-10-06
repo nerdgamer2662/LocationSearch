@@ -87,6 +87,12 @@ function Map() {
 
       console.log(filtered_results);
 
+      filtered_results.forEach((place) => {
+        const center_location = {lat, lng};
+        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
+        place.distance = haversine_distance(center_location, place_location);
+      })
+
       console.log(sortOption);
       switch (sortOption) {
         case "rating":
@@ -100,11 +106,6 @@ function Map() {
           break;
         case 'distance':
           console.log("Sorting By Distance")
-          filtered_results.forEach((place) => {
-            const center_location = {lat, lng};
-            const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
-            place.distance = haversine_distance(center_location, place_location);
-          })
   
           filtered_results.sort((min, max) => (min.distance || 0) - (max.distance || 0));
 
@@ -154,6 +155,7 @@ function Map() {
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="flex flex-wrap -mx-2 mb-6">
           <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
+            <label htmlFor="set_lat" className="ml-2">Latitude: </label>
             <input
               type="text"
               value={latitude}
@@ -164,6 +166,7 @@ function Map() {
             />
           </div>
           <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
+            <label htmlFor="set_lng" className="ml-2">Longitude: </label>
             <input
               type="text"
               value={longitude}
@@ -173,25 +176,9 @@ function Map() {
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
           </div>
-          <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
-            <label htmlFor = "sort_dropdown" className="ml-2">Choose Sorting</label>
-
-            <select
-              id="sort_dropdown"
-              value={sortOption}
-              onChange={(e) => sortOptionHandler(e.target.value)}
-              className="w-full px-6 py-4 border rounded-lg text-lg"
-            >
-              <option value="" disabled> Select an option</option>
-              <option value="nothing">None</option>
-              <option value="rating">Rating</option>
-              <option value="distance">Distance</option>
-              <option value="price">TODO: Price</option>
-            </select>
-            <p>Selected: {sortOption}</p>
-          </div>
           {/* Radius Input */}
           <div className="w-full md:w-1/3 px-2">
+            <label htmlFor="set_radius" className="ml-2">Search Radius: </label>
             <input
               type="text"
               value={radius}
@@ -202,9 +189,11 @@ function Map() {
             />
           </div>
           <div className="w-full md:w-1/3 px-2">
+            <label htmlFor="numResults" className="ml-2">Number of Results: </label>
+
             <input
               type="number"
-               min="1"
+              min="1"
               max="20"
               value={numPlaces}
               onChange={(e) => setNumPlaces(e.target.value)}
@@ -213,6 +202,7 @@ function Map() {
             />
           </div>
           <div className="w-full md:w-1/3 px-2">
+            <label htmlFor="filter_restaurant" className="ml-2">Filter Restaurant: </label>
             <input
               type="checkbox"
               id="filter_restaurant"
@@ -220,9 +210,9 @@ function Map() {
               onChange={(e) => settype_restaurant(e.target.checked)}
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
-            <label htmlFor="filter_restaurant" className="ml-2">Filter Restaurant</label>
           </div>
           <div className="w-full md:w-1/3 px-2">
+            <label htmlFor="placeType_tourist" className="ml-2">Filter Tourist Attraction: </label>
             <input
               type="checkbox"
               id="filter_tourist"
@@ -230,9 +220,25 @@ function Map() {
               onChange={(e) => settype_tourist(e.target.checked)}
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
-            <label htmlFor="placeType_tourist" className="ml-2">Filter Tourist Attraction</label>
+          </div>
+          <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
+            <label htmlFor = "sort_dropdown" className="ml-2">Choose Sorting: </label>
+
+            <select
+              id="sort_dropdown"
+              value={sortOption}
+              onChange={(e) => sortOptionHandler(e.target.value)}
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            >
+              <option value="" disabled> Select an option</option>
+              <option value="nothing">None</option>
+              <option value="rating">Rating</option>
+              <option value="distance">Distance (mi)</option>
+              <option value="price">TODO: Price</option>
+            </select>
           </div>
         </div>
+
         
         <button
           type="submit"
@@ -254,14 +260,14 @@ function Map() {
                   <th className="px-8 py-4 text-left text-lg">Rating</th>
                   <th className="px-8 py-4 text-left text-lg">Description</th>
                   <th className="px-8 py-4 text-left text-lg">Website</th>
-                  <th className="px-8 py-4 text-left text-lg">Distance</th>
+                  <th className="px-8 py-4 text-left text-lg">Distance (mi)</th>
                 </tr>
               </thead>
               <tbody>
                 {places.map((place, index) => (
                   <tr key={index} className={`${index % 2 === 0 ? "bg-gray-100" : "bg-white"} hover:bg-gray-200 transition-all`}>
                     <td className="border px-6 py-4 text-lg">{place.displayName}</td>
-                    <td className="border px-6 py-4 text-lg">{place.types}</td>
+                    <td className="border px-6 py-4 text-lg">{place.types.map(type => type.replace(/_/g, ' ')).join(', ')}</td>
                     <td className="border px-6 py-4 text-lg">
                       {place.rating ? (
                         <span className="text-yellow-500">
@@ -282,6 +288,7 @@ function Map() {
                         'N/A'
                       )}
                     </td>
+                    <td className="border px-6 py-4 text-lg">{place.distance}</td>
                   </tr>
                 ))}
               </tbody>
