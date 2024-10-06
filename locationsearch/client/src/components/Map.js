@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { initMap, centerMap, nearbySearch, MI_TO_METERS } from "../components/MapUtils";
+import { initMap, centerMap, nearbySearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
 
 function Map() {
   const [latitude, setLatitude] = useState("");
@@ -10,8 +10,13 @@ function Map() {
   const [places, setPlaces] = useState([]);
   const mapRef = useRef(null);
 
+
   const [placeType_restaurant, settype_restaurant] = useState(false);
   const [placeType_tourist, settype_tourist] = useState(false);
+  const [ratingSort, setRatingSort] = useState(false);
+  const [priceSort, setPriceSort] = useState(false);
+  const [distSort, setDistSort] = useState(false);
+  const [sortOption, sortOptionHandler] = useState("");
 
   useEffect(() => {
     const loadMap = async () => {
@@ -77,7 +82,51 @@ function Map() {
         console.log(filtered_results);
       }
 
-      setPlaces(filtered_results);
+      console.log(filteredPlaces);
+
+      console.log(sortOption);
+      switch (sortOption) {
+        case "rating":
+          console.log("Sorting By Rating");
+          filteredPlaces.sort((min, max) => (max.rating || 0) - (min.rating || 0));
+
+          filteredPlaces.forEach((place) => {
+            console.log(`Place: ${place.name}, Rating: ${place.rating !== undefined ? place.rating : 'Not Available'}`);
+          });
+    
+          break;
+        case 'distance':
+          console.log("Sorting By Distance")
+          filteredPlaces.forEach((place) => {
+            const center_location = {lat, lng};
+            const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
+            place.distance = haversine_distance(center_location, place_location);
+          })
+  
+          filteredPlaces.sort((min, max) => (min.distance || 0) - (max.distance || 0));
+
+          filteredPlaces.forEach((place) => {
+            console.log(`Place: ${place.name}, Distance: ${place.distance !== undefined ? place.distance : 'Not Available'}`);
+          });
+
+          break;
+        case 'price':
+          filteredPlaces.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
+
+          filteredPlaces.forEach((place) => {
+            console.log(`Place: ${place.name}, Price Level: ${place.price_level !== undefined ? place.price_level : 'Not Available'}`);
+          });
+    
+          break;
+        default:
+          console.log('No Sorting');
+      }
+
+      console.log(filteredPlaces);
+
+      
+      setPlaces(filteredPlaces);
+
     } catch (err) {
       console.error("Error during search:", err);
       setError("An error occurred during search. Please try again.");
@@ -110,6 +159,23 @@ function Map() {
               required
               className="w-full px-6 py-4 border rounded-lg text-lg"
             />
+          </div>
+          <div className="w-full md:w-1/3 px-2 mb-4 md:mb-0">
+            <label htmlFor = "sort_dropdown" className="ml-2">Choose Sorting</label>
+
+            <select
+              id="sort_dropdown"
+              value={sortOption}
+              onChange={(e) => sortOptionHandler(e.target.value)}
+              className="w-full px-6 py-4 border rounded-lg text-lg"
+            >
+              <option value="" disabled> Select an option</option>
+              <option value="nothing">None</option>
+              <option value="rating">Rating</option>
+              <option value="distance">Distance</option>
+              <option value="price">TODO: Price</option>
+            </select>
+            <p>Selected: {sortOption}</p>
           </div>
           {/* Radius Input */}
           <div className="w-full md:w-1/3 px-2">
@@ -164,6 +230,7 @@ function Map() {
                   <th className="px-8 py-4 text-left text-lg">Rating</th>
                   <th className="px-8 py-4 text-left text-lg">Description</th>
                   <th className="px-8 py-4 text-left text-lg">Website</th>
+                  <th className="px-8 py-4 text-left text-lg">Distance</th>
                 </tr>
               </thead>
               <tbody>
