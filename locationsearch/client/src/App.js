@@ -13,7 +13,7 @@ import { AuthContext } from "../../../locationsearch/client/src/components/AuthC
 function App() {
   // const [isLoggedIn, setIsLoggedIn] = useState(false);
   // const [username, setUsername] = useState("");
-  const { isLoggedIn, username, login } = useContext(AuthContext);
+  const { isLoggedIn, username, login, logout } = useContext(AuthContext);
 
 
   useEffect(() => {
@@ -52,6 +52,11 @@ function App() {
               </li>
             </ul>
           </nav>
+          <div className="auth-action">
+              {isLoggedIn && (
+                  <button onClick={logout} className="logout-button">Logout</button>
+              )}
+          </div>
           <div className="auth-status">
             {isLoggedIn ? (
               <p>Welcome, {username}!</p>

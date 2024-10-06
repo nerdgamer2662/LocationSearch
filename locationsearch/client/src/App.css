@@ -1,3 +1,5 @@
+/* App.css */
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
@@ -33,10 +35,30 @@ body {
   font-size: 18px;
 }
 
+.auth-actions {
+  display: flex;
+  align-items: center;
+}
+
 .auth-status {
   color: white;
   font-size: 18px;
-  margin-left: auto;
+  margin-left: 20px;
+}
+
+.logout-button {
+  background-color: #ff4b5c;
+  border: none;
+  color: white;
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #ff1f3a;
 }
 
 main {
