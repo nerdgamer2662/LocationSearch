@@ -71,6 +71,10 @@ function Map() {
         searchTypes.push(adjustedType.trim().toLowerCase().replace(/\s+/g, '_'));
       }
       */
+
+      if (placeType.trim() !== "") {
+        searchTypes.push(placeType.trim().toLowerCase().replace(/\s+/g, '_'));
+      }
      
       let foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
 
