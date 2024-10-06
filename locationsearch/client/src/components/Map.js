@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { initMap, centerMap, nearbySearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
+import { initMap, centerMap, processPlaces, nearbySearch, detailSearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
 
 function Map() {
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [radius, setRadius] = useState("");
+  const [latitude, setLatitude] = useState(33.7756);
+  const [longitude, setLongitude] = useState(-84.3963);
+  const [radius, setRadius] = useState(20);
   const [error, setError] = useState("");
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [places, setPlaces] = useState([]);
@@ -87,11 +87,38 @@ function Map() {
 
       console.log(filtered_results);
 
+      let specific_place;
+
       filtered_results.forEach((place) => {
         const center_location = {lat, lng};
         const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
         place.distance = haversine_distance(center_location, place_location);
-      })
+
+      });
+
+      filtered_results.forEach((place) => {
+        const center_location = {lat, lng};
+        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
+        place.distance = haversine_distance(center_location, place_location);
+
+      });
+
+      let price_results = await processPlaces(filtered_results);
+      
+      let index = 0;
+      price_results.forEach((price) => {
+        if (!price)
+        {
+          price = 0;
+        }
+        filtered_results[index].price_level = price;
+        index = index + 1;
+      });
+
+      console.log("price_results");
+      console.log(price_results);
+
+      
 
       console.log(sortOption);
       switch (sortOption) {
@@ -115,6 +142,7 @@ function Map() {
 
           break;
         case 'price':
+
           filtered_results.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
 
           filtered_results.forEach((place) => {
@@ -261,6 +289,7 @@ function Map() {
                   <th className="px-8 py-4 text-left text-lg">Description</th>
                   <th className="px-8 py-4 text-left text-lg">Website</th>
                   <th className="px-8 py-4 text-left text-lg">Distance (mi)</th>
+                  <th className="px-8 py-4 text-left text-lg">Price Level (1 Low, 4 High)</th>
                 </tr>
               </thead>
               <tbody>
@@ -289,6 +318,7 @@ function Map() {
                       )}
                     </td>
                     <td className="border px-6 py-4 text-lg">{place.distance}</td>
+                    <td className="border px-6 py-4 text-lg">{place.price_level}</td>
                   </tr>
                 ))}
               </tbody>
