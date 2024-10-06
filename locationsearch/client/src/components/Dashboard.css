@@ -1,0 +1,38 @@
+/* Dashboard.css */
+
+.dashboard-container {
+    background: url('../image/Desktop Photo Old Quad.jpg') no-repeat center center/cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+    background-color: #f5f5f5;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  .dashboard-container h1 {
+    color: #f0eeee;
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-container p {
+    color: #e4dfdf;
+    margin-bottom: 40px;
+  }
+  
+  .map-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .map-button:hover {
+    background-color: #0056b3;
+  }
