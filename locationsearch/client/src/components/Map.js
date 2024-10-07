@@ -63,53 +63,8 @@ function Map() {
       centerMap(lat, lng);
       
       const searchTypes = [...placeTypes];
-
-      //let adjustedType = await getSynonyms(placeType);
-
-      //if (adjustedType.trim() !== "") {
-        //searchTypes.push(adjustedType.trim().toLowerCase().replace(/\s+/g, '_'));
-      //}
-      
-
-      // if (placeType.trim() !== "") {
-      //   searchTypes.push(placeType.trim().toLowerCase().replace(/\s+/g, '_'));
-      // }
      
       let foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
-
-      /*
-      foundPlaces.forEach((place) => {
-        const center_location = {lat, lng};
-        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
-        place.distance = haversine_distance(center_location, place_location);
-
-      });
-
-      foundPlaces.forEach((place) => {
-        const center_location = {lat, lng};
-        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
-        place.distance = haversine_distance(center_location, place_location);
-
-      });
-
-      let price_results = await processPlaces(foundPlaces);
-      
-      let index = 0;
-      price_results.forEach((price) => {
-        if (!price)
-        {
-          price = 0;
-        }
-        foundPlaces[index].price_level = price;
-        index = index + 1;
-      });
-      
-      foundPlaces.forEach((place) => {
-        const center_location = {lat, lng};
-        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
-        place.distance = haversine_distance(center_location, place_location);
-      });
-      */
 
       switch (sortOption) {
         case "rating":

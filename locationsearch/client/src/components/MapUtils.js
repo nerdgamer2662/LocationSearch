@@ -117,17 +117,11 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
         index = index + 1;
       });
 
-
-      //places.forEach(addMarker);
       places.forEach(place => bounds.extend(place.location));
       map.fitBounds(bounds);
     } else {
       console.log("No results found.");
     }
-
-    //places.forEach(place => {
-      //console.log('Place ID:', place.id);  // Correctly access place_id here
-    //});
 
     return places;
   } catch (error) {
@@ -138,8 +132,6 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
 
 export async function detailSearch(place_id) {
 
-  //console.log("place_id");
-  //console.log(place_id);
   const service = new google.maps.places.PlacesService(map);
   const request = {
     placeId: place_id,
