@@ -78,6 +78,7 @@ function Map() {
      
       let foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
 
+      /*
       foundPlaces.forEach((place) => {
         const center_location = {lat, lng};
         const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
@@ -109,7 +110,7 @@ function Map() {
         const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
         place.distance = haversine_distance(center_location, place_location);
       });
-
+      */
 
       switch (sortOption) {
         case "rating":
@@ -309,7 +310,7 @@ function Map() {
                         'N/A'
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{place.distance.toFixed(2)} mi</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{place.distance} mi</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {place.price_level ? '💰'.repeat(place.price_level) : 'N/A'}
                     </td>
