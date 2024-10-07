@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./LoginForm.css";
 import { API_BASE_URL } from "../config";
-import { AuthContext } from "../../../../locationsearch/client/src/components/AuthContext";
-
-
+import { AuthContext } from "../components/AuthContext";
 
 function LoginForm() {
   const [username, setUsername] = useState("");
@@ -13,7 +11,6 @@ function LoginForm() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,7 +54,9 @@ function LoginForm() {
           required
           className="login-input"
         />
-        <button type="submit" className="login-button">Log In</button>
+        <button type="submit" className="login-button">
+          Log In
+        </button>
       </form>
     </div>
   );
