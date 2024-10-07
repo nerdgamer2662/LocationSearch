@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { initMap, centerMap, processPlaces, nearbySearch, detailSearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
-//import { getSynonyms } from "../components/GPTRequest";
+import {
+  initMap,
+  centerMap,
+  processPlaces,
+  nearbySearch,
+  detailSearch,
+  MI_TO_METERS,
+  haversine_distance,
+} from "../components/MapUtils";
+import { getSynonyms } from "../components/GPTRequest";
 
 function Map() {
   const [latitude, setLatitude] = useState(33.7756);
@@ -43,8 +51,8 @@ function Map() {
 
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
-    setPlaceTypes(prev => 
-      checked ? [...prev, value] : prev.filter(type => type !== value)
+    setPlaceTypes((prev) =>
+      checked ? [...prev, value] : prev.filter((type) => type !== value)
     );
   };
 
@@ -61,21 +69,23 @@ function Map() {
       rad = Math.min(Math.max(rad, 0), 50000);
 
       centerMap(lat, lng);
-      
+
       const searchTypes = [...placeTypes];
 
-      /*
       let adjustedType = await getSynonyms(placeType);
 
+      console.log(adjustedType);
+
       if (adjustedType.trim() !== "") {
-        searchTypes.push(adjustedType.trim().toLowerCase().replace(/\s+/g, '_'));
+        searchTypes.push(
+          adjustedType.trim().toLowerCase().replace(/\s+/g, "_")
+        );
       }
-      */
 
       if (placeType.trim() !== "") {
-        searchTypes.push(placeType.trim().toLowerCase().replace(/\s+/g, '_'));
+        searchTypes.push(placeType.trim().toLowerCase().replace(/\s+/g, "_"));
       }
-     
+
       let foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
 
       /*
@@ -116,21 +126,21 @@ function Map() {
         case "rating":
           foundPlaces.sort((a, b) => (b.rating || 0) - (a.rating || 0));
           break;
-        case 'distance':
+        case "distance":
           foundPlaces.sort((a, b) => (a.distance || 0) - (b.distance || 0));
           break;
-        case 'price':
+        case "price":
+          foundPlaces.sort(
+            (min, max) => (max.price_level || 0) - (min.price_level || 0)
+          );
 
-          foundPlaces.sort((min, max) => (max.price_level || 0) - (min.price_level || 0));
-    
           break;
         default:
-          // No sorting
+        // No sorting
       }
 
       let numResults = Math.min(Math.max(parseInt(numPlaces) || 10, 1), 20);
       setPlaces(foundPlaces.slice(0, numResults));
-
     } catch (err) {
       console.error("Error during search:", err);
       setError("An error occurred during search. Please try again.");
@@ -139,18 +149,33 @@ function Map() {
 
   return (
     <div className="container mx-auto px-4 py-8 bg-gray-100 min-h-screen">
-      <h1 className="text-4xl font-bold mb-8 text-center text-indigo-800">Location Search</h1>
+      <h1 className="text-4xl font-bold mb-8 text-center text-indigo-800">
+        Location Search
+      </h1>
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div ref={mapRef} style={{ width: '100%', height: '400px' }} className="mb-6"></div>
+        <div
+          ref={mapRef}
+          style={{ width: "100%", height: "400px" }}
+          className="mb-6"
+        ></div>
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {error && <p className="text-red-500 mb-4 bg-red-100 p-3 rounded">{error}</p>}
-          
+          {error && (
+            <p className="text-red-500 mb-4 bg-red-100 p-3 rounded">{error}</p>
+          )}
+
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4 text-indigo-700">Search Parameters</h2>
+            <h2 className="text-xl font-semibold mb-4 text-indigo-700">
+              Search Parameters
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div className="flex space-x-4">
                 <div className="flex-1">
-                  <label htmlFor="set_lat" className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+                  <label
+                    htmlFor="set_lat"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Latitude
+                  </label>
                   <input
                     id="set_lat"
                     type="text"
@@ -162,7 +187,12 @@ function Map() {
                   />
                 </div>
                 <div className="flex-1">
-                  <label htmlFor="set_lng" className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+                  <label
+                    htmlFor="set_lng"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Longitude
+                  </label>
                   <input
                     id="set_lng"
                     type="text"
@@ -175,7 +205,12 @@ function Map() {
                 </div>
               </div>
               <div>
-                <label htmlFor="set_radius" className="block text-sm font-medium text-gray-700 mb-1">Search Radius (mi)</label>
+                <label
+                  htmlFor="set_radius"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Search Radius (mi)
+                </label>
                 <input
                   id="set_radius"
                   type="range"
@@ -189,25 +224,39 @@ function Map() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4 text-indigo-700">Search Preferences</h2>
+            <h2 className="text-xl font-semibold mb-4 text-indigo-700">
+              Search Preferences
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="numResults" className="block text-sm font-medium text-gray-700 mb-1">Number of Results</label>
+                <label
+                  htmlFor="numResults"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Number of Results
+                </label>
                 <select
                   id="numResults"
                   value={numPlaces}
                   onChange={(e) => setNumPlaces(e.target.value)}
                   className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 >
-                  {[5, 10, 15, 20].map(num => (
-                    <option key={num} value={num}>{num}</option>
+                  {[5, 10, 15, 20].map((num) => (
+                    <option key={num} value={num}>
+                      {num}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label htmlFor="sort_dropdown" className="block text-sm font-medium text-gray-700 mb-1">Sort Results By</label>
+                <label
+                  htmlFor="sort_dropdown"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Sort Results By
+                </label>
                 <select
                   id="sort_dropdown"
                   value={sortOption}
@@ -222,11 +271,18 @@ function Map() {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-gray-50 p-4 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4 text-indigo-700">Place Types</h2>
+            <h2 className="text-xl font-semibold mb-4 text-indigo-700">
+              Place Types
+            </h2>
             <div className="mb-4">
-              <label htmlFor="placeType" className="block text-sm font-medium text-gray-700 mb-1">Custom Place Type</label>
+              <label
+                htmlFor="placeType"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Custom Place Type
+              </label>
               <input
                 id="placeType"
                 type="text"
@@ -268,51 +324,106 @@ function Map() {
           </button>
         </form>
       </div>
-      
+
       <div className="mt-8 bg-white rounded-lg shadow-lg overflow-hidden">
-        <h2 className="text-2xl font-semibold p-6 bg-indigo-100 text-indigo-800">Nearby Places</h2>
+        <h2 className="text-2xl font-semibold p-6 bg-indigo-100 text-indigo-800">
+          Nearby Places
+        </h2>
         {places.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Website</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Distance</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Type
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Rating
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Description
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Website
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Distance
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Price
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {places.map((place, index) => (
                   <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{place.displayName}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{place.types.map(type => type.replace(/_/g, ' ')).join(', ')}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {place.displayName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {place.types
+                        .map((type) => type.replace(/_/g, " "))
+                        .join(", ")}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {place.rating ? (
                         <span className="text-yellow-500">
-                          {'★'.repeat(Math.round(place.rating))}{' '}
-                          ({place.rating.toFixed(1)})
+                          {"★".repeat(Math.round(place.rating))} (
+                          {place.rating.toFixed(1)})
                         </span>
                       ) : (
-                        'N/A'
+                        "N/A"
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{place.editorialSummary?.text || 'No description available'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                      {place.editorialSummary?.text ||
+                        "No description available"}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {place.websiteURI ? (
-                        <a href={place.websiteURI} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-900">
+                        <a
+                          href={place.websiteURI}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-indigo-600 hover:text-indigo-900"
+                        >
                           Visit Website
                         </a>
                       ) : (
-                        'N/A'
+                        "N/A"
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{place.distance} mi</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {place.price_level ? '💰'.repeat(place.price_level) : 'N/A'}
+                      {place.distance} mi
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {place.price_level
+                        ? "💰".repeat(place.price_level)
+                        : "N/A"}
                     </td>
                   </tr>
                 ))}
@@ -320,12 +431,13 @@ function Map() {
             </table>
           </div>
         ) : (
-          <p className="text-lg text-gray-500 p-6">No places found. Try searching with different parameters.</p>
+          <p className="text-lg text-gray-500 p-6">
+            No places found. Try searching with different parameters.
+          </p>
         )}
       </div>
     </div>
   );
 }
-
 
 export default Map;
