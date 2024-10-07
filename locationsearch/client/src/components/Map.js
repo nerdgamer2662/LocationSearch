@@ -72,6 +72,8 @@ function Map() {
 
       const searchTypes = [...placeTypes];
 
+      console.log(placeType);
+
       let adjustedType = await getSynonyms(placeType);
 
       console.log(adjustedType);
@@ -82,9 +84,6 @@ function Map() {
         );
       }
 
-      if (placeType.trim() !== "") {
-        searchTypes.push(placeType.trim().toLowerCase().replace(/\s+/g, "_"));
-      }
 
       let foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
 

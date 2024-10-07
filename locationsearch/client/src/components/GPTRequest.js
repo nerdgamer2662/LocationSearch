@@ -1,10 +1,8 @@
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey:
-    "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",
-  dangerouslyAllowBrowser: true,
-});
+
+const openai = new OpenAI({ apiKey: process.env.REACT_APP_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
+
 
 export async function getSynonyms(initWord) {
   let completion = await openai.chat.completions.create({
