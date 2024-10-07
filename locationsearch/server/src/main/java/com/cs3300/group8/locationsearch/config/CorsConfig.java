@@ -19,6 +19,10 @@ public class CorsConfig implements WebMvcConfigurer{
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://localhost:3000");
+        
+        // Add production frontend URL
+        config.addAllowedOrigin("https://frontend-dot-round-office-437918-e3.ue.r.appspot.com"); // Add your frontend URL here
+
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);

@@ -3,9 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./SignUpForm.css";
 import { API_BASE_URL } from "../config";
-import { AuthContext } from "../../../../locationsearch/client/src/components/AuthContext"; //locationsearch/client/src/components/AuthContext.js
-
-
+import { AuthContext } from "../components/AuthContext"; //locationsearch/client/src/components/AuthContext.js
 
 function SignUpForm() {
   const [username, setUsername] = useState("");
@@ -25,7 +23,13 @@ function SignUpForm() {
       const response = await axios.post(
         `${API_BASE_URL}/api/users/signup`,
         { username, password },
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
       );
       alert("Sign up successful!");
       const { token } = response.data; // Assuming the token is in response.data.token
@@ -71,7 +75,9 @@ function SignUpForm() {
           required
           className="signup-input"
         />
-        <button type="submit" className="signup-button">Sign Up</button>
+        <button type="submit" className="signup-button">
+          Sign Up
+        </button>
       </form>
     </div>
   );

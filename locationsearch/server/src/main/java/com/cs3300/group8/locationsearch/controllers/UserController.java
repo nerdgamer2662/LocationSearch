@@ -1,7 +1,12 @@
 package com.cs3300.group8.locationsearch.controllers;
 
+import java.util.Date;
+
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,12 +20,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
-import java.util.Date;
-
-import javax.crypto.SecretKey;
-
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "https://frontend-dot-round-office-437918-e3.ue.r.appspot.com", allowCredentials = "true")
 public class UserController {
     @Autowired
     private UserRepository userRepository;

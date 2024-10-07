@@ -7,14 +7,12 @@ import LoginForm from "./components/LoginForm";
 import Dashboard from "./components/Dashboard";
 import Map from "./components/Map";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { AuthContext } from "../../../locationsearch/client/src/components/AuthContext";
-
+import { AuthContext } from "./components/AuthContext";
 
 function App() {
   // const [isLoggedIn, setIsLoggedIn] = useState(false);
   // const [username, setUsername] = useState("");
   const { isLoggedIn, username, login, logout } = useContext(AuthContext);
-
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -38,24 +36,25 @@ function App() {
               </li>
               {!isLoggedIn && (
                 <>
-                <li>
-                  <Link to="/signup">Sign Up</Link>
-                </li>
-                <li>
-                  <Link to="/login">Login</Link>
-                </li> 
+                  <li>
+                    <Link to="/signup">Sign Up</Link>
+                  </li>
+                  <li>
+                    <Link to="/login">Login</Link>
+                  </li>
                 </>
-              )
-              }
+              )}
               <li>
                 <Link to="/map">Map</Link>
               </li>
             </ul>
           </nav>
           <div className="auth-action">
-              {isLoggedIn && (
-                  <button onClick={logout} className="logout-button">Logout</button>
-              )}
+            {isLoggedIn && (
+              <button onClick={logout} className="logout-button">
+                Logout
+              </button>
+            )}
           </div>
           <div className="auth-status">
             {isLoggedIn ? (
@@ -72,7 +71,14 @@ function App() {
             <Route path="/signup" element={<SignUpForm />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/map" element={<ProtectedRoute><Map /></ProtectedRoute>} />
+            <Route
+              path="/map"
+              element={
+                <ProtectedRoute>
+                  <Map />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </main>
       </div>
