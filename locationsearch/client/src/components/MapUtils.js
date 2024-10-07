@@ -54,6 +54,7 @@ export function centerMap(latitude, longitude) {
   if (map) {
     map.setCenter({ lat: latitude, lng: longitude });
   }
+
 }
 
 export async function nearbySearch(latitude, longitude, radius, placeTypes) {
@@ -73,6 +74,16 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
 
     const { places } = await Place.searchNearby(request);
     deleteMarkers();
+
+    //Add Custom Marker for Entered Lat/Lng
+    const ref_marker = new google.maps.Marker({
+      map,
+      position: {lat: latitude, lng: longitude},
+      title: "Center",
+      icon: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+    });
+    markers.push(ref_marker);
+  
 
     if (places.length) {
       const bounds = new google.maps.LatLngBounds();
