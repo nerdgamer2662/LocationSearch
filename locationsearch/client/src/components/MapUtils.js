@@ -125,10 +125,6 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
       console.log("No results found.");
     }
 
-    //places.forEach(place => {
-      //console.log('Place ID:', place.id);  // Correctly access place_id here
-    //});
-
     return places;
   } catch (error) {
     console.error("Error during nearby search:", error);
@@ -138,8 +134,6 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
 
 export async function detailSearch(place_id) {
 
-  //console.log("place_id");
-  //console.log(place_id);
   const service = new google.maps.places.PlacesService(map);
   const request = {
     placeId: place_id,
