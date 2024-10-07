@@ -76,6 +76,37 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
 
     if (places.length) {
       const bounds = new google.maps.LatLngBounds();
+
+      console.log("Summaries Found");
+      places.forEach((place) => {
+        console.log(place.editorialSummary);
+      });
+
+      console.log("Places Distances");
+      places.forEach((place) => {
+        const center_location = {lat: latitude, lng: longitude};
+        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
+        console.log(center_location);
+        console.log(place_location);
+        place.distance = (haversine_distance(center_location, place_location)).toFixed(2);
+        console.log(place.distance);
+      });
+
+      let price_results = await processPlaces(places);
+      
+      console.log("Places Prices");
+      let index = 0;
+      price_results.forEach((price) => {
+        if (!price)
+        {
+          price = 0;
+        }
+        places[index].price_level = price;
+        console.log(places[index].price_level);
+        index = index + 1;
+      });
+
+
       places.forEach(addMarker);
       places.forEach(place => bounds.extend(place.location));
       map.fitBounds(bounds);
@@ -83,9 +114,9 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
       console.log("No results found.");
     }
 
-    places.forEach(place => {
-      console.log('Place ID:', place.id);  // Correctly access place_id here
-    });
+    //places.forEach(place => {
+      //console.log('Place ID:', place.id);  // Correctly access place_id here
+    //});
 
     return places;
   } catch (error) {
@@ -96,8 +127,8 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
 
 export async function detailSearch(place_id) {
 
-  console.log("place_id");
-  console.log(place_id);
+  //console.log("place_id");
+  //console.log(place_id);
   const service = new google.maps.places.PlacesService(map);
   const request = {
     placeId: place_id,
@@ -142,8 +173,20 @@ function addMarker(place) {
     content: createInfoWindowContent(place),
   });
 
+  const miniPopup = new google.maps.InfoWindow({
+    content: createMiniInfoWindowContent(place),
+  });
+
   marker.addListener("click", () => {
     infoWindow.open(map, marker);
+  });
+
+  marker.addListener("mouseover", () => {
+    miniPopup.open(map, marker);
+  });
+
+  marker.addListener("mouseout", () => {
+    miniPopup.close();
   });
 
   markers.push(marker);
@@ -153,10 +196,21 @@ function createInfoWindowContent(place) {
   return `
     <div>
       <h3>${place.displayName}</h3>
+      <p>Rating: ${place.rating ? `${place.rating.toFixed(1)} / 5` : '<p>Rating N/A</p>'}</p>
+      <p>Distance: ${place.distance}</p>
+      ${place.priceLevel ? `<p>Price Level: ${place.priceLevel}</p>` : '<p>Price Level: N/A</p>'}
+      ${place.editorialSummary ? `<p>${place.editorialSummary}</p>` : '<p>Summary N/A</p>'}
+      ${place.websiteURI ? `<p><a href="${place.websiteURI}" target="_blank">Website</a></p>` : '<p>Website N/A</p>'}
+    </div>
+  `;
+}
+
+function createMiniInfoWindowContent(place) {
+  return `
+    <div>
+      <h3>${place.displayName}</h3>
       <p>Rating: ${place.rating ? `${place.rating.toFixed(1)} / 5` : 'N/A'}</p>
-      ${place.priceLevel ? `<p>Price Level: ${place.priceLevel}</p>` : ''}
-      ${place.editorialSummary ? `<p>${place.editorialSummary.text}</p>` : ''}
-      ${place.websiteURI ? `<p><a href="${place.websiteURI}" target="_blank">Website</a></p>` : ''}
+      <p>Distance: ${place.distance}</p>
     </div>
   `;
 }
