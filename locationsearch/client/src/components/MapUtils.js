@@ -118,7 +118,7 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
       });
 
 
-      places.forEach(addMarker);
+      //places.forEach(addMarker);
       places.forEach(place => bounds.extend(place.location));
       map.fitBounds(bounds);
     } else {
@@ -171,6 +171,7 @@ export async function processPlaces(results) {
   return price_list;
 }
 
+
 function addMarker(place) {
   if (!map) return; // Ensure map is initialized
 
@@ -201,6 +202,12 @@ function addMarker(place) {
   });
 
   markers.push(marker);
+}
+
+export function addMarkers(places) {
+
+  places.forEach((place => addMarker(place)));
+
 }
 
 function createInfoWindowContent(place) {

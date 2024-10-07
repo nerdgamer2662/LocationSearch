@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { initMap, centerMap, processPlaces, nearbySearch, detailSearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
-import { getSynonyms } from "../components/GPTRequest";
+import { initMap, centerMap, processPlaces, addMarkers, nearbySearch, detailSearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
+//import { getSynonyms } from "../components/GPTRequest";
 
 function Map() {
   const [latitude, setLatitude] = useState(33.7756);
@@ -64,11 +64,11 @@ function Map() {
       
       const searchTypes = [...placeTypes];
 
-      let adjustedType = await getSynonyms(placeType);
+      //let adjustedType = await getSynonyms(placeType);
 
-      if (adjustedType.trim() !== "") {
-        searchTypes.push(adjustedType.trim().toLowerCase().replace(/\s+/g, '_'));
-      }
+      //if (adjustedType.trim() !== "") {
+        //searchTypes.push(adjustedType.trim().toLowerCase().replace(/\s+/g, '_'));
+      //}
       
 
       // if (placeType.trim() !== "") {
@@ -128,7 +128,11 @@ function Map() {
       }
 
       let numResults = Math.min(Math.max(parseInt(numPlaces) || 10, 1), 20);
-      setPlaces(foundPlaces.slice(0, numResults));
+
+      let displayedPlaces = foundPlaces.slice(0, numResults);
+
+      setPlaces(displayedPlaces);   //Update List
+      addMarkers(displayedPlaces);  //Update Map Markers
 
     } catch (err) {
       console.error("Error during search:", err);
