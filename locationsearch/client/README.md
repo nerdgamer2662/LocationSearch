@@ -43,6 +43,10 @@ LocationSearch is a web application that allows users to find interesting locati
    ```bash
    npm start
    ```
+5. **Run the server-side application** to enable login/security functionality:
+   ```bash
+   .\mvnw.cmd spring-boot:run
+   ```
 
 ## Usage
 
