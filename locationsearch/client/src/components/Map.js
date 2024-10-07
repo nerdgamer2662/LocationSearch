@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { initMap, centerMap, processPlaces, nearbySearch, detailSearch, MI_TO_METERS, haversine_distance } from "../components/MapUtils";
-import { getSynonyms } from "../components/GPTRequest";
+//import { getSynonyms } from "../components/GPTRequest";
 
 function Map() {
   const [latitude, setLatitude] = useState(33.7756);
@@ -64,16 +64,17 @@ function Map() {
       
       const searchTypes = [...placeTypes];
 
+      /*
       let adjustedType = await getSynonyms(placeType);
 
       if (adjustedType.trim() !== "") {
         searchTypes.push(adjustedType.trim().toLowerCase().replace(/\s+/g, '_'));
       }
-      
+      */
 
-      // if (placeType.trim() !== "") {
-      //   searchTypes.push(placeType.trim().toLowerCase().replace(/\s+/g, '_'));
-      // }
+      if (placeType.trim() !== "") {
+        searchTypes.push(placeType.trim().toLowerCase().replace(/\s+/g, '_'));
+      }
      
       let foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
 
