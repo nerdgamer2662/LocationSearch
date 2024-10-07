@@ -47,6 +47,7 @@ export async function initMap(mapElement, onMapClick) {
       onMapClick(latitude, longitude);
     }
   });
+  return map;
 }
 
 export function centerMap(latitude, longitude) {
