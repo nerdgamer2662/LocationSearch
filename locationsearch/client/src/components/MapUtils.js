@@ -68,7 +68,7 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
         radius: radius,
       },
       includedPrimaryTypes: placeTypes.length > 0 ? placeTypes : ["restaurant", "bar", "cafe", "tourist_attraction"],
-      maxResultCount: 5, // for demo only; for dev keept at 5
+      maxResultCount: 20, // for demo only; for dev keept at 5
       rankPreference: SearchNearbyRankPreference.POPULARITY,
     };
 
