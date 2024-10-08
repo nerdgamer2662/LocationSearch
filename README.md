@@ -18,6 +18,8 @@
 
 LocationSearch is a web application that allows users to find interesting locations near them. It consists of a client-side application built with React and a server-side application built with Spring Boot. The application features user authentication, location data management, and a responsive design.
 
+It is deployed currently at: https://frontend-dot-round-office-437918-e3.ue.r.appspot.com/
+
 ## Release Notes
 
 ### Version 1.0.0
