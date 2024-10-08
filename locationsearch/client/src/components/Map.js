@@ -70,56 +70,34 @@ function Map() {
 
       centerMap(lat, lng);
 
-      const searchTypes = [...placeTypes];
+      let foundPlaces = [];
+      // handle empty textbox (placeType) for GPT
+      if (placeType.trim() === "") {
+        setError("Please enter a place type.");
+        // ["restaurant", "bar", "cafe", "tourist_attraction"]
 
-      console.log(placeType);
+        const searchTypes = [...placeTypes];
 
-      let adjustedType = await getSynonyms(placeType);
-
-      console.log(adjustedType);
-
-      if (adjustedType.trim() !== "") {
-        searchTypes.push(
-          adjustedType.trim().toLowerCase().replace(/\s+/g, "_")
-        );
-      }
+        foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
 
 
-      let foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
-
-      /*
-      foundPlaces.forEach((place) => {
-        const center_location = {lat, lng};
-        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
-        place.distance = haversine_distance(center_location, place_location);
-
-      });
-
-      foundPlaces.forEach((place) => {
-        const center_location = {lat, lng};
-        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
-        place.distance = haversine_distance(center_location, place_location);
-
-      });
-
-      let price_results = await processPlaces(foundPlaces);
-      
-      let index = 0;
-      price_results.forEach((price) => {
-        if (!price)
-        {
-          price = 0;
+      } else {
+        const searchTypes = [...placeTypes];
+  
+        console.log(placeType);
+  
+        let adjustedType = await getSynonyms(placeType);
+  
+        console.log(adjustedType);
+  
+        if (adjustedType.trim() !== "") {
+          searchTypes.push(
+            adjustedType.trim().toLowerCase().replace(/\s+/g, "_")
+          );
         }
-        foundPlaces[index].price_level = price;
-        index = index + 1;
-      });
-      
-      foundPlaces.forEach((place) => {
-        const center_location = {lat, lng};
-        const place_location  = {lat: place.location.lat(), lng: place.location.lng()};
-        place.distance = haversine_distance(center_location, place_location);
-      });
-      */
+        
+        foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
+      }
 
       switch (sortOption) {
         case "rating":
