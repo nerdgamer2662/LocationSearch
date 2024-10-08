@@ -15,7 +15,7 @@ function loadGoogleMapsScript() {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&libraries=places`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCkK-j0HC0sgyE9rLVeSDHaDqG1PDv1FAg&libraries=places`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
@@ -67,8 +67,8 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
         center: center,
         radius: radius,
       },
-      includedPrimaryTypes: placeTypes.length > 0 ? placeTypes : undefined,
-      maxResultCount: 5,
+      includedPrimaryTypes: placeTypes.length > 0 ? placeTypes : ["restaurant", "bar", "cafe", "tourist_attraction"],
+      maxResultCount: 20, // for demo only; for dev keept at 5
       rankPreference: SearchNearbyRankPreference.POPULARITY,
     };
 
