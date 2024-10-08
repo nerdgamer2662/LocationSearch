@@ -377,7 +377,7 @@ function Map() {
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                      {place.editorialSummary?.text ||
+                      {place.editorialSummary ||
                         "No description available"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
