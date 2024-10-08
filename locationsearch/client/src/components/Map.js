@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   initMap,
   centerMap,
-  processPlaces,
+  // processPlaces,
   nearbySearch,
-  detailSearch,
+  // detailSearch,
   MI_TO_METERS,
-  haversine_distance,
+  // haversine_distance,
 } from "../components/MapUtils";
 import { getSynonyms } from "../components/GPTRequest";
 
