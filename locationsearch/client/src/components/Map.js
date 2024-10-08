@@ -71,6 +71,7 @@ function Map() {
       centerMap(lat, lng);
 
       let foundPlaces = [];
+      let numResults = Math.min(Math.max(parseInt(numPlaces) || 10, 1), 20);
       // handle empty textbox (placeType) for GPT
       if (placeType.trim() === "") {
         setError("Please enter a place type.");
@@ -78,7 +79,7 @@ function Map() {
 
         const searchTypes = [...placeTypes];
 
-        foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
+        foundPlaces = await nearbySearch(lat, lng, rad, searchTypes, numResults);
 
 
       } else {
@@ -96,7 +97,7 @@ function Map() {
           );
         }
         
-        foundPlaces = await nearbySearch(lat, lng, rad, searchTypes);
+        foundPlaces = await nearbySearch(lat, lng, rad, searchTypes, numResults);
       }
 
       switch (sortOption) {
@@ -116,7 +117,6 @@ function Map() {
         // No sorting
       }
 
-      let numResults = Math.min(Math.max(parseInt(numPlaces) || 10, 1), 20);
       setPlaces(foundPlaces.slice(0, numResults));
     } catch (err) {
       console.error("Error during search:", err);

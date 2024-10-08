@@ -57,7 +57,7 @@ export function centerMap(latitude, longitude) {
 
 }
 
-export async function nearbySearch(latitude, longitude, radius, placeTypes) {
+export async function nearbySearch(latitude, longitude, radius, placeTypes, numResults) {
   try {
     const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
     const center = new google.maps.LatLng(latitude, longitude);
@@ -68,7 +68,7 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes) {
         radius: radius,
       },
       includedPrimaryTypes: placeTypes.length > 0 ? placeTypes : ["restaurant", "bar", "cafe", "tourist_attraction"],
-      maxResultCount: 20, // for demo only; for dev keept at 5
+      maxResultCount: numResults, // for demo only; for dev keept at 5
       rankPreference: SearchNearbyRankPreference.POPULARITY,
     };
 
