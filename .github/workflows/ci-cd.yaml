@@ -36,6 +36,7 @@ jobs:
     - name: Build and test client
       run: |
         cd locationsearch/client
+        npm install
         npm ci
         npm update
         CI=false npm run build
