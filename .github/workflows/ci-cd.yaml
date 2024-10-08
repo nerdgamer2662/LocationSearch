@@ -1,4 +1,4 @@
-name: locationsearch-app-cicd
+name: CI/CD Pipeline
 
 on: 
   push:
