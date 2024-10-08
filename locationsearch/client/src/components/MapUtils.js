@@ -103,7 +103,7 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes, numR
         console.log(place.distance);
       });
 
-      let price_results = await processPlaces(places);
+      let [price_results, direction_results] = await processPlaces(places);
       
       console.log("Places Prices");
       let index = 0;
@@ -117,6 +117,16 @@ export async function nearbySearch(latitude, longitude, radius, placeTypes, numR
         index = index + 1;
       });
 
+      console.log("Place Maps URLs");
+      index = 0;
+      direction_results.forEach((url) => {
+        if (!url) {
+          url = "";
+        }
+        places[index].directions = url;
+        console.log(places[index].directions);
+        index = index + 1;
+      });
 
       places.forEach(addMarker);
       places.forEach(place => bounds.extend(place.location));
@@ -143,14 +153,14 @@ export async function detailSearch(place_id) {
   const service = new google.maps.places.PlacesService(map);
   const request = {
     placeId: place_id,
-    fields: ['price_level']
+    fields: ['price_level', 'url']
   };
 
   // Wrapping the getDetails call in a Promise
   return new Promise((resolve, reject) => {
     service.getDetails(request, (place, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK) {
-        resolve(place.price_level);  // Resolve the promise with price_level
+        resolve([place.price_level, place.url]);  // Resolve the promise with price_level
       } else {
         reject(new Error('Failed to fetch place details'));  // Reject in case of an error
       }
@@ -160,15 +170,17 @@ export async function detailSearch(place_id) {
 
 export async function processPlaces(results) {
   let price_list = [];
+  let directions_list = [];
   for (const specific_place of results) {
     try {
-      specific_place.price_level = await detailSearch(specific_place.id);
+      [specific_place.price_level, specific_place.directions_url] = await detailSearch(specific_place.id);
       price_list.push(specific_place.price_level);
+      directions_list.push(specific_place.directions_url);
     } catch (error) {
       console.error('Error fetching price level for place:', specific_place.name, error);
     }
   }
-  return price_list;
+  return [price_list, directions_list];
 }
 
 function addMarker(place) {
@@ -212,6 +224,7 @@ function createInfoWindowContent(place) {
       ${place.priceLevel ? `<p>Price Level: ${place.priceLevel}</p>` : '<p>Price Level: N/A</p>'}
       ${place.editorialSummary ? `<p>${place.editorialSummary}</p>` : '<p>Summary N/A</p>'}
       ${place.websiteURI ? `<p><a href="${place.websiteURI}" target="_blank">Website</a></p>` : '<p>Website N/A</p>'}
+      ${place.directions ? `<p><a href="${place.directions}" target="_blank">Directions</a></p>` : '<p>Could not get directions</p>'}
     </div>
   `;
 }
