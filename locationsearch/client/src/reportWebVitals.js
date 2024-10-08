@@ -1,11 +1,15 @@
-const reportWebVitals = onPerfEntry => {
-  if (onPerfEntry && onPerfEntry instanceof Function) {
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(onPerfEntry);
-      getFID(onPerfEntry);
-      getFCP(onPerfEntry);
-      getLCP(onPerfEntry);
-      getTTFB(onPerfEntry);
+const reportWebVitals = (onPerformanceEntry) => {
+  const isValidFunction = onPerformanceEntry && typeof onPerformanceEntry === 'function';
+
+  if (isValidFunction) {
+    import('web-vitals').then((webVitals) => {
+      const { getCLS, getFID, getFCP, getLCP, getTTFB } = webVitals;
+
+      getCLS(onPerformanceEntry);
+      getFID(onPerformanceEntry);
+      getFCP(onPerformanceEntry);
+      getLCP(onPerformanceEntry);
+      getTTFB(onPerformanceEntry);
     });
   }
 };
