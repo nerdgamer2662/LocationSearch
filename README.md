@@ -1,5 +1,19 @@
 # LocationSearch Project
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Release Notes](#release-notes)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Configuration](#configuration)
+- [API Endpoints](#api-endpoints)
+- [Troubleshooting](#troubleshooting)
+- [License](#license)
+
 ## Overview
 
 LocationSearch is a web application that allows users to find interesting locations near them. It consists of a client-side application built with React and a server-side application built with Spring Boot. The application features user authentication, location data management, and a responsive design.
