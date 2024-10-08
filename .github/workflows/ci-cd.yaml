@@ -3,7 +3,8 @@ name: CI/CD Pipeline
 on: 
   push:
     branches:
-      - [main, cicd]
+      - main
+      - cicd
   pull_request:
     branches:
       - main
